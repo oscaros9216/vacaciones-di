@@ -1,5 +1,5 @@
 // Configuración
-const SCRIPT_URL = 'https://script.google.com/macros/s/AKfycby1Xl4EaGVHgXTpOcgu0pE_V3jjwcghnUrWVlCJB09ft5CfW4sH0_0-aC7rHdcWxYOsbA/exec';
+const SCRIPT_URL = 'https://script.google.com/macros/s/AKfycbxeCKDgsL_4PgrBUZJ78iVYXacYs_XRcg4xgBudW0mSMy-pfE99yLuhVG2HYAsLG6VKUQ/exec';
 const TIMEOUT = 8000; // 8 segundos para timeout de peticiones
 
 // Variables globales
