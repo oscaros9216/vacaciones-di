@@ -1,5 +1,6 @@
 // Configuración
 const SCRIPT_URL = 'https://script.google.com/macros/s/AKfycby1Xl4EaGVHgXTpOcgu0pE_V3jjwcghnUrWVlCJB09ft5CfW4sH0_0-aC7rHdcWxYOsbA/exec';
+const TIMEOUT = 8000; // 8 segundos para timeout de peticiones
 
 // Variables globales
 let currentUser = null;
@@ -15,31 +16,50 @@ document.addEventListener('DOMContentLoaded', function() {
   }
 });
 
+// ------------------------- FUNCIONES DE PÁGINA -------------------------
+
 function initLoginPage() {
   const loginForm = document.getElementById('loginForm');
   
-  loginForm.addEventListener('submit', function(e) {
+  loginForm.addEventListener('submit', async function(e) {
     e.preventDefault();
     
-    const email = document.getElementById('email').value;
+    const email = document.getElementById('email').value.trim();
     const password = document.getElementById('password').value;
     
-    login(email, password)
-      .then(data => {
-        if (data.token) {
-          // Guardar token y redirigir
-          localStorage.setItem('authToken', data.token);
-          localStorage.setItem('userRole', data.rol);
-          localStorage.setItem('userEmail', data.email);
-          window.location.href = 'dashboard.html';
-        } else {
-          alert('Error: ' + (data.error || 'Credenciales incorrectas'));
-        }
-      })
-      .catch(error => {
-        console.error('Error:', error);
-        alert('Error al iniciar sesión');
-      });
+    if (!email || !password) {
+      showAlert('Por favor ingresa email y contraseña', 'error');
+      return;
+    }
+
+    try {
+      const loginBtn = document.querySelector('#loginForm button[type="submit"]');
+      loginBtn.disabled = true;
+      loginBtn.innerHTML = '<span class="spinner-border spinner-border-sm" role="status" aria-hidden="true"></span> Iniciando...';
+      
+      const data = await login(email, password);
+      
+      if (data.token) {
+        // Guardar datos de usuario
+        localStorage.setItem('authToken', data.token);
+        localStorage.setItem('userRole', data.rol);
+        localStorage.setItem('userEmail', data.email);
+        
+        // Redirigir al dashboard
+        window.location.href = 'dashboard.html';
+      } else {
+        showAlert(data.error || 'Credenciales incorrectas', 'error');
+      }
+    } catch (error) {
+      console.error('Error en login:', error);
+      showAlert(error.message || 'Error al iniciar sesión', 'error');
+    } finally {
+      const loginBtn = document.querySelector('#loginForm button[type="submit"]');
+      if (loginBtn) {
+        loginBtn.disabled = false;
+        loginBtn.textContent = 'Iniciar sesión';
+      }
+    }
   });
 }
 
@@ -69,6 +89,18 @@ function initDashboard() {
   }
   
   // Configurar canvas de firma
+  initSignaturePad();
+  
+  // Configurar eventos
+  setupEventListeners();
+  
+  // Cargar lista de colaboradores
+  loadColaboradores();
+}
+
+// ------------------------- FUNCIONES DE UI -------------------------
+
+function initSignaturePad() {
   const canvas = document.getElementById('firmaCanvas');
   if (canvas) {
     signaturePad = new SignaturePad(canvas, {
@@ -76,56 +108,115 @@ function initDashboard() {
       penColor: 'rgb(0, 0, 0)'
     });
     
+    // Ajustar canvas al cambiar tamaño de ventana
+    window.addEventListener('resize', resizeSignaturePad);
+    resizeSignaturePad();
+    
     document.getElementById('limpiarFirma').addEventListener('click', function() {
       signaturePad.clear();
     });
   }
-  
-  // Configurar eventos de navegación
-  document.getElementById('navColaboradores').addEventListener('click', function(e) {
+}
+
+function resizeSignaturePad() {
+  if (signaturePad) {
+    const canvas = document.getElementById('firmaCanvas');
+    const ratio = Math.max(window.devicePixelRatio || 1, 1);
+    
+    canvas.width = canvas.offsetWidth * ratio;
+    canvas.height = canvas.offsetHeight * ratio;
+    canvas.getContext('2d').scale(ratio, ratio);
+    
+    signaturePad.clear(); // Limpiar y redibujar en nueva resolución
+  }
+}
+
+function setupEventListeners() {
+  // Navegación
+  document.getElementById('navColaboradores')?.addEventListener('click', function(e) {
     e.preventDefault();
     loadColaboradores();
   });
   
-  document.getElementById('navRegistro').addEventListener('click', function(e) {
+  document.getElementById('navRegistro')?.addEventListener('click', function(e) {
     e.preventDefault();
     showRegistroForm();
   });
   
-  document.getElementById('logoutBtn').addEventListener('click', function() {
+  document.getElementById('logoutBtn')?.addEventListener('click', function() {
     logout();
   });
   
-  document.getElementById('cancelarRegistro').addEventListener('click', function() {
+  document.getElementById('cancelarRegistro')?.addEventListener('click', function() {
     hideRegistroForm();
   });
   
-  document.getElementById('colaboradorForm').addEventListener('submit', function(e) {
+  // Formulario de colaborador
+  document.getElementById('colaboradorForm')?.addEventListener('submit', function(e) {
     e.preventDefault();
     saveColaborador();
   });
-  
-  // Cargar lista de colaboradores por defecto
-  loadColaboradores();
 }
 
-// Funciones de API
-async function login(email, password) {
-  const response = await fetch(`${SCRIPT_URL}?action=login`, {
-    method: 'POST',
-    headers: {
-      'Content-Type': 'application/x-www-form-urlencoded',
-    },
-    body: `email=${encodeURIComponent(email)}&password=${encodeURIComponent(password)}`
-  });
+function showAlert(message, type = 'success') {
+  const alertDiv = document.createElement('div');
+  alertDiv.className = `alert alert-${type} alert-dismissible fade show`;
+  alertDiv.role = 'alert';
+  alertDiv.innerHTML = `
+    ${message}
+    <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
+  `;
   
-  return await response.json();
+  const container = document.getElementById('alertsContainer') || document.body;
+  container.prepend(alertDiv);
+  
+  // Auto-ocultar después de 5 segundos
+  setTimeout(() => {
+    alertDiv.classList.remove('show');
+    setTimeout(() => alertDiv.remove(), 150);
+  }, 5000);
+}
+
+// ------------------------- FUNCIONES CRUD -------------------------
+
+async function login(email, password) {
+  const response = await fetchWithTimeout(
+    `${SCRIPT_URL}?action=login`,
+    {
+      method: 'POST',
+      headers: {
+        'Content-Type': 'application/x-www-form-urlencoded',
+      },
+      body: `email=${encodeURIComponent(email)}&password=${encodeURIComponent(password)}`
+    }
+  );
+  
+  const data = await response.json();
+  
+  if (!response.ok || data.error) {
+    throw new Error(data.error || 'Error en la respuesta del servidor');
+  }
+  
+  return data;
 }
 
 async function loadColaboradores() {
   try {
+    showLoading(true);
+    
     const token = localStorage.getItem('authToken');
-    const response = await fetch(`${SCRIPT_URL}?action=obtenerColaboradores&token=${token}`);
+    if (!token) {
+      throw new Error('No hay sesión activa');
+    }
+    
+    const response = await fetchWithTimeout(
+      `${SCRIPT_URL}?action=obtenerColaboradores&token=${token}`
+    );
+    
+    if (!response.ok) {
+      throw new Error(`Error ${response.status}: ${response.statusText}`);
+    }
+    
     const data = await response.json();
     
     if (data.error) {
@@ -136,16 +227,30 @@ async function loadColaboradores() {
     hideRegistroForm();
   } catch (error) {
     console.error('Error al cargar colaboradores:', error);
-    alert('Error al cargar colaboradores: ' + error.message);
+    
+    if (error.message.includes('No autorizado') || error.message.includes('sesión')) {
+      showAlert('Tu sesión ha expirado. Por favor inicia sesión nuevamente.', 'warning');
+      setTimeout(() => logout(), 2000);
+    } else {
+      showAlert('Error al cargar colaboradores: ' + error.message, 'error');
+    }
+  } finally {
+    showLoading(false);
   }
 }
 
 function displayColaboradores(colaboradores) {
   const container = document.getElementById('colaboradoresList');
+  if (!container) return;
+  
   container.innerHTML = '';
   
   if (!colaboradores || colaboradores.length === 0) {
-    container.innerHTML = '<p>No hay colaboradores registrados</p>';
+    container.innerHTML = `
+      <div class="alert alert-info">
+        No hay colaboradores registrados
+      </div>
+    `;
     return;
   }
   
@@ -154,175 +259,4 @@ function displayColaboradores(colaboradores) {
       <div class="card-header d-flex justify-content-between align-items-center">
         <h4>Lista de Colaboradores</h4>
         ${currentUser.role === 'admin' ? 
-          '<button class="btn btn-sm btn-primary" id="addColaboradorBtn">Agregar Nuevo</button>' : ''}
-      </div>
-      <div class="card-body">
-        <div class="table-responsive">
-          <table class="table table-striped">
-            <thead>
-              <tr>
-                <th>Nombre</th>
-                <th>Número</th>
-                <th>Rol</th>
-                <th>Fecha Ingreso</th>
-                <th>Email</th>
-                <th>Acciones</th>
-              </tr>
-            </thead>
-            <tbody>
-  `;
-  
-  colaboradores.forEach(col => {
-    html += `
-      <tr>
-        <td>${col.nombre}</td>
-        <td>${col.numero}</td>
-        <td>${col.rol}</td>
-        <td>${col.fechaIngreso}</td>
-        <td>${col.email}</td>
-        <td>
-          ${currentUser.role === 'admin' ? `
-            <button class="btn btn-sm btn-outline-primary edit-btn" data-id="${col.id}">Editar</button>
-            <button class="btn btn-sm btn-outline-danger delete-btn" data-id="${col.id}">Eliminar</button>
-          ` : '--'}
-        </td>
-      </tr>
-    `;
-  });
-  
-  html += `
-            </tbody>
-          </table>
-        </div>
-      </div>
-    </div>
-  `;
-  
-  container.innerHTML = html;
-  
-  // Agregar eventos a los botones
-  if (currentUser.role === 'admin') {
-    document.getElementById('addColaboradorBtn').addEventListener('click', showRegistroForm);
-    
-    document.querySelectorAll('.edit-btn').forEach(btn => {
-      btn.addEventListener('click', function() {
-        const id = this.getAttribute('data-id');
-        editColaborador(id);
-      });
-    });
-    
-    document.querySelectorAll('.delete-btn').forEach(btn => {
-      btn.addEventListener('click', function() {
-        const id = this.getAttribute('data-id');
-        if (confirm('¿Estás seguro de eliminar este colaborador?')) {
-          deleteColaborador(id);
-        }
-      });
-    });
-  }
-}
-
-async function saveColaborador() {
-  try {
-    const token = localStorage.getItem('authToken');
-    const form = document.getElementById('colaboradorForm');
-    const id = document.getElementById('colaboradorId').value;
-    
-    // Obtener firma como imagen base64
-    let firma = '';
-    if (signaturePad && !signaturePad.isEmpty()) {
-      firma = signaturePad.toDataURL();
-    }
-    
-    const formData = {
-      token: token,
-      rol: document.getElementById('rol').value,
-      nombre: document.getElementById('nombre').value,
-      firma: firma,
-      numero: document.getElementById('numero').value,
-      fechaIngreso: document.getElementById('fechaIngreso').value,
-      email: document.getElementById('email').value
-    };
-    
-    let url = `${SCRIPT_URL}?action=`;
-    url += id ? 'actualizarColaborador' : 'registrarColaborador';
-    
-    if (id) {
-      formData.id = id;
-    }
-    
-    const response = await fetch(url, {
-      method: 'POST',
-      headers: {
-        'Content-Type': 'application/x-www-form-urlencoded',
-      },
-      body: Object.keys(formData)
-        .map(key => `${encodeURIComponent(key)}=${encodeURIComponent(formData[key])}`)
-        .join('&')
-    });
-    
-    const data = await response.json();
-    
-    if (data.error) {
-      throw new Error(data.error);
-    }
-    
-    alert('Colaborador guardado correctamente');
-    form.reset();
-    if (signaturePad) signaturePad.clear();
-    loadColaboradores();
-  } catch (error) {
-    console.error('Error al guardar colaborador:', error);
-    alert('Error al guardar colaborador: ' + error.message);
-  }
-}
-
-// Funciones de UI
-function showRegistroForm(colaborador = null) {
-  const form = document.getElementById('registroForm');
-  const formTitle = document.querySelector('#registroForm .card-header h4');
-  const colaboradorId = document.getElementById('colaboradorId');
-  
-  if (colaborador) {
-    formTitle.textContent = 'Editar Colaborador';
-    colaboradorId.value = colaborador.id;
-    document.getElementById('rol').value = colaborador.rol;
-    document.getElementById('nombre').value = colaborador.nombre;
-    document.getElementById('numero').value = colaborador.numero;
-    document.getElementById('fechaIngreso').value = colaborador.fechaIngreso;
-    document.getElementById('email').value = colaborador.email;
-    
-    if (colaborador.firma && signaturePad) {
-      // Cargar firma existente si hay
-      const image = new Image();
-      image.src = colaborador.firma;
-      image.onload = function() {
-        signaturePad.clear();
-        signaturePad.fromDataURL(colaborador.firma);
-      };
-    } else if (signaturePad) {
-      signaturePad.clear();
-    }
-  } else {
-    formTitle.textContent = 'Registrar Nuevo Colaborador';
-    colaboradorId.value = '';
-    if (signaturePad) signaturePad.clear();
-  }
-  
-  form.style.display = 'block';
-  document.getElementById('colaboradoresList').style.display = 'none';
-}
-
-function hideRegistroForm() {
-  document.getElementById('registroForm').style.display = 'none';
-  document.getElementById('colaboradoresList').style.display = 'block';
-  document.getElementById('colaboradorForm').reset();
-  if (signaturePad) signaturePad.clear();
-}
-
-function logout() {
-  localStorage.removeItem('authToken');
-  localStorage.removeItem('userRole');
-  localStorage.removeItem('userEmail');
-  window.location.href = 'index.html';
-}
+          '<button class="btn btn-sm btn
