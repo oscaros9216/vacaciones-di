@@ -1,5 +1,5 @@
 // Configuración
-const SCRIPT_URL = 'https://script.google.com/macros/s/AKfycbwLpoig7hpTylq_MrGjP8G82I2V9Upl1JH-7pg2lp-Si45gAQlqTLWUyVgOYLqRJ2m-xw/exec';
+const SCRIPT_URL = 'https://script.google.com/macros/s/AKfycby1Xl4EaGVHgXTpOcgu0pE_V3jjwcghnUrWVlCJB09ft5CfW4sH0_0-aC7rHdcWxYOsbA/exec';
 
 // Variables globales
 let currentUser = null;
