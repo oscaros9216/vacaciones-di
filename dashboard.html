@@ -3,33 +3,14 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Dashboard - Sistema de Colaboradores</title>
+    <title>Dashboard</title>
     <link rel="stylesheet" href="css/style.css">
     <style>
-        .dashboard-container {
-            max-width: 800px;
-            margin: 2rem auto;
-            padding: 2rem;
-            background-color: white;
-            border-radius: 8px;
-            box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
-        }
-        header {
-            display: flex;
-            justify-content: space-between;
-            align-items: center;
-            margin-bottom: 2rem;
-        }
-        .btn-logout {
-            padding: 0.5rem 1rem;
-            background-color: #f44336;
-            color: white;
-            border: none;
-            border-radius: 4px;
-            cursor: pointer;
-        }
-        .btn-logout:hover {
-            background-color: #d32f2f;
+        .debug-panel {
+            padding: 10px;
+            background: #f0f0f0;
+            margin-top: 20px;
+            border-radius: 5px;
         }
     </style>
 </head>
@@ -40,12 +21,13 @@
             <button id="logoutBtn" class="btn-logout">Cerrar Sesión</button>
         </header>
         <main>
-            <div id="userInfo" class="user-info"></div>
+            <div id="userInfo"></div>
             <div class="dashboard-content">
-                <h2>Módulos del Sistema</h2>
-                <p>Contenido del dashboard irá aquí.</p>
+                <h2>Panel de Control</h2>
+                <p>Contenido del dashboard aquí.</p>
             </div>
         </main>
+        <div id="debugInfo" class="debug-panel"></div>
     </div>
     <script src="js/dashboard.js"></script>
 </body>
