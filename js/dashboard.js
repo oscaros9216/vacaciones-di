@@ -1,36 +1,30 @@
-// Reemplaza la función saveToGoogleSheets con esta versión:
-function saveToGoogleSheets(data) {
-    const APPS_SCRIPT_URL = "https://script.google.com/macros/s/AKfycbyI4TwH2l1rrjl5-wR27HRNjRu7jzroC8W5Buf8UasI7Qq2yg0ruGnx9SEzrU5wQTorpA/exec";
+registerForm.addEventListener('submit', function(e) {
+    e.preventDefault();
     
-    return new Promise((resolve, reject) => {
-        // Convertir la firma a una cadena base64 simple
+    if (!signaturePad.isEmpty()) {
+        // Obtener la firma en formato PNG sin cabecera
+        const signatureData = signaturePad.toDataURL('image/png').split(',')[1];
+        
+        // Obtener datos del formulario
         const formData = {
-            ...data,
-            firma: data.firma // Ya está en formato base64
+            action: 'saveUserData',
+            id: document.getElementById('userId').value,
+            rol: document.getElementById('userRole').value,
+            nombre: document.getElementById('fullName').value,
+            firma: signatureData, // Enviamos solo el base64 sin prefijo
+            numero_colaborador: document.getElementById('employeeNumber').value,
+            fecha_ingreso: document.getElementById('hireDate').value,
+            email: document.getElementById('email').value,
+            contraseña: document.getElementById('password').value,
+            vacaciones: document.getElementById('vacationAuth').value,
+            jefe_directo: document.getElementById('managerName').value,
+            correo_jefe: document.getElementById('managerEmail').value,
+            titulo_evento: document.getElementById('eventTitle').value,
+            correos_invitados: document.getElementById('guestEmails').value,
+            descripcion: document.getElementById('description').value,
+            mensaje: document.getElementById('message').value
         };
-
-        fetch(`${APPS_SCRIPT_URL}?action=saveUserData`, {
-            method: 'POST',
-            headers: {
-                'Content-Type': 'application/json',
-            },
-            body: JSON.stringify(formData)
-        })
-        .then(response => {
-            if (!response.ok) {
-                throw new Error('Error en la respuesta del servidor');
-            }
-            return response.json();
-        })
-        .then(data => {
-            if (data.success) {
-                resolve(data);
-            } else {
-                reject(new Error(data.message || 'Error desconocido'));
-            }
-        })
-        .catch(error => {
-            reject(error);
-        });
-    });
-}
+        
+        // Resto del código de envío...
+    }
+});
