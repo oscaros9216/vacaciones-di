@@ -3,32 +3,136 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Dashboard</title>
+    <title>Dashboard - Sistema de Colaboradores</title>
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.10.0/font/bootstrap-icons.css">
     <link rel="stylesheet" href="css/style.css">
-    <style>
-        .debug-panel {
-            padding: 10px;
-            background: #f0f0f0;
-            margin-top: 20px;
-            border-radius: 5px;
-        }
-    </style>
 </head>
 <body>
     <div class="dashboard-container">
         <header>
-            <h1>Bienvenido al Dashboard</h1>
-            <button id="logoutBtn" class="btn-logout">Cerrar Sesión</button>
-        </header>
-        <main>
-            <div id="userInfo"></div>
-            <div class="dashboard-content">
-                <h2>Panel de Control</h2>
-                <p>Contenido del dashboard aquí.</p>
+            <h1>Panel de Control</h1>
+            <div class="user-info">
+                <span id="userEmail"></span>
+                <button id="logoutBtn" class="btn-logout"><i class="bi bi-box-arrow-right"></i> Cerrar Sesión</button>
             </div>
-        </main>
-        <div id="debugInfo" class="debug-panel"></div>
+        </header>
+        
+        <div class="dashboard-grid">
+            <!-- Panel de opciones -->
+            <div class="options-panel">
+                <div class="option-card" id="registerUserBtn">
+                    <i class="bi bi-person-plus"></i>
+                    <span>Registrar Nuevo Usuario</span>
+                </div>
+                <div class="option-card" id="requestDayBtn">
+                    <i class="bi bi-calendar-plus"></i>
+                    <span>Solicitar Día</span>
+                </div>
+            </div>
+            
+            <!-- Formulario de registro (inicialmente oculto) -->
+            <div class="form-panel" id="registerFormPanel" style="display:none;">
+                <h2><i class="bi bi-person-plus"></i> Registrar Nuevo Usuario</h2>
+                <form id="registerForm">
+                    <input type="hidden" id="userId">
+                    
+                    <div class="form-row">
+                        <div class="form-group">
+                            <label for="userRole">Rol *</label>
+                            <select id="userRole" required>
+                                <option value="">Seleccionar...</option>
+                                <option value="admin">Administrador</option>
+                                <option value="user">Usuario</option>
+                            </select>
+                        </div>
+                        
+                        <div class="form-group">
+                            <label for="employeeNumber">Número de Colaborador *</label>
+                            <input type="number" id="employeeNumber" required>
+                        </div>
+                    </div>
+                    
+                    <div class="form-group">
+                        <label for="fullName">Nombre Completo *</label>
+                        <input type="text" id="fullName" required>
+                    </div>
+                    
+                    <div class="form-row">
+                        <div class="form-group">
+                            <label for="hireDate">Fecha de Ingreso *</label>
+                            <input type="date" id="hireDate" required>
+                        </div>
+                        
+                        <div class="form-group">
+                            <label for="email">Email *</label>
+                            <input type="email" id="email" required>
+                        </div>
+                    </div>
+                    
+                    <div class="form-row">
+                        <div class="form-group">
+                            <label for="password">Contraseña *</label>
+                            <input type="password" id="password" required pattern="^(?=.*[A-Za-z])(?=.*\d)(?=.*[@$!%*#?&])[A-Za-z\d@$!%*#?&]{8,}$" title="Mínimo 8 caracteres con letras, números y símbolos">
+                            <div class="password-strength" id="passwordStrength"></div>
+                        </div>
+                        
+                        <div class="form-group">
+                            <label for="vacationAuth">¿Se autorizan vacaciones?</label>
+                            <select id="vacationAuth">
+                                <option value="Si" selected>Sí</option>
+                                <option value="No">No</option>
+                            </select>
+                        </div>
+                    </div>
+                    
+                    <div class="form-group">
+                        <label for="managerName">Jefe Directo *</label>
+                        <input type="text" id="managerName" required>
+                    </div>
+                    
+                    <div class="form-group">
+                        <label for="managerEmail">Correo Jefe Directo *</label>
+                        <input type="email" id="managerEmail" required>
+                    </div>
+                    
+                    <div class="form-group">
+                        <label for="eventTitle">Título del Evento</label>
+                        <input type="text" id="eventTitle">
+                    </div>
+                    
+                    <div class="form-group">
+                        <label for="guestEmails">Correos de Invitados</label>
+                        <textarea id="guestEmails" rows="2"></textarea>
+                    </div>
+                    
+                    <div class="form-group">
+                        <label for="description">Descripción</label>
+                        <textarea id="description" rows="3"></textarea>
+                    </div>
+                    
+                    <div class="form-group">
+                        <label for="message">Mensaje</label>
+                        <textarea id="message" rows="3"></textarea>
+                    </div>
+                    
+                    <div class="form-group">
+                        <label>Firma del Colaborador</label>
+                        <div class="signature-container">
+                            <canvas id="signaturePad" width="400" height="200"></canvas>
+                            <button type="button" id="clearSignature" class="btn-clear"><i class="bi bi-eraser"></i> Limpiar</button>
+                        </div>
+                    </div>
+                    
+                    <div class="form-actions">
+                        <button type="button" id="cancelBtn" class="btn-cancel"><i class="bi bi-x-circle"></i> Cancelar</button>
+                        <button type="submit" class="btn-submit"><i class="bi bi-save"></i> Guardar</button>
+                    </div>
+                </form>
+            </div>
+        </div>
     </div>
+
+    <script src="https://cdn.jsdelivr.net/npm/signature_pad@4.0.0/dist/signature_pad.umd.min.js"></script>
     <script src="js/dashboard.js"></script>
 </body>
 </html>
