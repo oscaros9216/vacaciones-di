@@ -1,5 +1,4 @@
-// Configuración
-const APPS_SCRIPT_URL = "https://script.google.com/macros/s/AKfycbwu71XUy0a44Zn8lN0hainBg8P7Oqz8IJK1ymj9lMX2EMJVwu5FICihDkWv4QqME8jA5Q/exec";
+const APPS_SCRIPT_URL = "https://script.google.com/macros/s/AKfycbyI4TwH2l1rrjl5-wR27HRNjRu7jzroC8W5Buf8UasI7Qq2yg0ruGnx9SEzrU5wQTorpA/exec";
 
 document.getElementById('loginForm').addEventListener('submit', async function(e) {
   e.preventDefault();
@@ -17,26 +16,20 @@ document.getElementById('loginForm').addEventListener('submit', async function(e
   showMessage("Verificando credenciales...", "info");
   
   try {
-    // Construir URL con parámetros
-    const url = new URL(APPS_SCRIPT_URL);
-    url.searchParams.append('action', 'validateLogin');
-    url.searchParams.append('email', email);
-    url.searchParams.append('password', password);
+    const url = `${APPS_SCRIPT_URL}?action=validateLogin&email=${encodeURIComponent(email)}&password=${encodeURIComponent(password)}`;
     
-    // Usar fetch con CORS mode
-    const response = await fetch(url, {
-      method: 'GET',
-      redirect: 'follow'
-    });
+    const response = await fetch(url);
     
-    // Verificar si hubo redirección (comportamiento normal de Apps Script)
-    if (response.redirected) {
-      const redirectedResponse = await fetch(response.url);
-      const data = await redirectedResponse.json();
-      processLoginResponse(data);
+    if (!response.ok) {
+      throw new Error(`Error HTTP: ${response.status}`);
+    }
+    
+    const data = await response.json();
+    
+    if (data.success) {
+      handleLoginSuccess(data);
     } else {
-      const data = await response.json();
-      processLoginResponse(data);
+      showMessage(data.message || "Credenciales incorrectas", "error");
     }
   } catch (error) {
     console.error("Error en la solicitud:", error);
@@ -44,22 +37,18 @@ document.getElementById('loginForm').addEventListener('submit', async function(e
   }
 });
 
-function processLoginResponse(data) {
-  if (data.success) {
-    showMessage("Inicio de sesión exitoso! Redirigiendo...", "success");
-    
-    // Guardar datos de sesión
-    localStorage.setItem('userEmail', data.data.email);
-    localStorage.setItem('userRole', data.data.role);
-    localStorage.setItem('isLoggedIn', 'true');
-    
-    // Redirigir después de 1.5 segundos
-    setTimeout(() => {
-      window.location.href = "dashboard.html";
-    }, 1500);
-  } else {
-    showMessage(data.message || "Credenciales incorrectas", "error");
-  }
+function handleLoginSuccess(data) {
+  showMessage("Inicio de sesión exitoso! Redirigiendo...", "success");
+  
+  // Guardar datos de sesión
+  localStorage.setItem('userEmail', data.email);
+  localStorage.setItem('userRole', data.role);
+  localStorage.setItem('isLoggedIn', 'true');
+  
+  // Redirigir después de 1.5 segundos
+  setTimeout(() => {
+    window.location.href = "dashboard.html";
+  }, 1500);
 }
 
 function showMessage(text, type) {
