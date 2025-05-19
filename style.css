@@ -1,14 +1,14 @@
+/* Estilos generales */
 body {
     font-family: 'Arial', sans-serif;
     background-color: #f5f5f5;
     margin: 0;
     padding: 0;
-    display: flex;
-    justify-content: center;
-    align-items: center;
-    height: 100vh;
+    line-height: 1.6;
+    color: #333;
 }
 
+/* Contenedor principal para el login */
 .login-container {
     background-color: white;
     padding: 2rem;
@@ -16,6 +16,7 @@ body {
     box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
     width: 100%;
     max-width: 400px;
+    margin: 2rem auto;
 }
 
 h1 {
@@ -24,6 +25,7 @@ h1 {
     margin-bottom: 1.5rem;
 }
 
+/* Estilos para formularios */
 .form-group {
     margin-bottom: 1rem;
 }
@@ -32,16 +34,30 @@ label {
     display: block;
     margin-bottom: 0.5rem;
     color: #555;
+    font-weight: 500;
 }
 
-input {
+input[type="email"],
+input[type="password"],
+input[type="text"] {
     width: 100%;
     padding: 0.75rem;
     border: 1px solid #ddd;
     border-radius: 4px;
     box-sizing: border-box;
+    font-size: 1rem;
+    transition: border-color 0.3s;
 }
 
+input[type="email"]:focus,
+input[type="password"]:focus,
+input[type="text"]:focus {
+    border-color: #4285f4;
+    outline: none;
+    box-shadow: 0 0 0 2px rgba(66, 133, 244, 0.2);
+}
+
+/* Botones */
 .btn-login {
     width: 100%;
     padding: 0.75rem;
@@ -52,55 +68,119 @@ input {
     cursor: pointer;
     font-size: 1rem;
     margin-top: 1rem;
+    transition: background-color 0.3s;
 }
 
 .btn-login:hover {
     background-color: #3367d6;
 }
 
+/* Mensajes */
 .message {
     margin-top: 1rem;
     padding: 0.75rem;
     border-radius: 4px;
     text-align: center;
+    font-size: 0.9rem;
 }
 
-.error {
-    background-color: #ffebee;
-    color: #c62828;
+.message.info {
+    background-color: #e3f2fd;
+    color: #1565c0;
 }
 
-.success {
+.message.success {
     background-color: #e8f5e9;
     color: #2e7d32;
 }
 
-@media (max-width: 480px) {
+.message.error {
+    background-color: #ffebee;
+    color: #c62828;
+}
+
+/* Dashboard */
+.dashboard-container {
+    max-width: 1200px;
+    margin: 0 auto;
+    padding: 20px;
+}
+
+header {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    margin-bottom: 30px;
+    padding-bottom: 15px;
+    border-bottom: 1px solid #eee;
+}
+
+.btn-logout {
+    padding: 8px 16px;
+    background-color: #f44336;
+    color: white;
+    border: none;
+    border-radius: 4px;
+    cursor: pointer;
+    font-size: 0.9rem;
+    transition: background-color 0.3s;
+}
+
+.btn-logout:hover {
+    background-color: #d32f2f;
+}
+
+.dashboard-content {
+    background: #f9f9f9;
+    padding: 20px;
+    border-radius: 4px;
+    box-shadow: 0 2px 4px rgba(0, 0, 0, 0.05);
+}
+
+.user-info {
+    background: #e8f5e9;
+    padding: 15px;
+    border-radius: 4px;
+    margin-bottom: 20px;
+    font-size: 0.95rem;
+}
+
+.user-info p {
+    margin: 5px 0;
+}
+
+/* Panel de depuración */
+.debug-panel {
+    font-family: 'Courier New', monospace;
+    font-size: 13px;
+    color: #333;
+    background: #f8f8f8;
+    padding: 15px;
+    margin-top: 30px;
+    border-radius: 4px;
+    border-left: 4px solid #4285f4;
+    overflow-x: auto;
+}
+
+.debug-panel p {
+    margin: 5px 0;
+    line-height: 1.4;
+}
+
+.debug-panel p:before {
+    content: "> ";
+    color: #666;
+}
+
+/* Responsive design */
+@media (max-width: 768px) {
     .login-container {
         margin: 1rem;
         padding: 1.5rem;
     }
-}
-/* Añade esto al final de tu archivo CSS existente */
-
-.dashboard-content {
-    margin-top: 2rem;
-    padding: 1rem;
-    background-color: #f9f9f9;
-    border-radius: 4px;
-}
-
-.user-info {
-    background-color: #e8f5e9;
-    padding: 1rem;
-    border-radius: 4px;
-    margin-bottom: 1rem;
-}
-
-@media (max-width: 600px) {
+    
     .dashboard-container {
-        margin: 1rem;
-        padding: 1rem;
+        padding: 15px;
     }
     
     header {
@@ -111,4 +191,95 @@ input {
     .btn-logout {
         margin-top: 1rem;
     }
+}
+
+@media (max-width: 480px) {
+    .login-container {
+        margin: 0.5rem;
+        padding: 1rem;
+        box-shadow: none;
+        border: 1px solid #ddd;
+    }
+    
+    h1 {
+        font-size: 1.5rem;
+    }
+    
+    input[type="email"],
+    input[type="password"],
+    input[type="text"] {
+        padding: 0.6rem;
+    }
+    
+    .btn-login {
+        padding: 0.6rem;
+    }
+}
+
+/* Animaciones */
+@keyframes fadeIn {
+    from { opacity: 0; }
+    to { opacity: 1; }
+}
+
+.message {
+    animation: fadeIn 0.3s ease-in-out;
+}
+
+/* Estilos para la firma digital (preparación para el siguiente módulo) */
+.signature-pad {
+    border: 1px solid #ddd;
+    border-radius: 4px;
+    background: white;
+    cursor: crosshair;
+}
+
+.signature-clear-btn {
+    background: #f44336;
+    color: white;
+    border: none;
+    padding: 5px 10px;
+    margin-top: 5px;
+    border-radius: 4px;
+    cursor: pointer;
+    font-size: 0.8rem;
+}
+
+/* Clases de utilidad */
+.text-center {
+    text-align: center;
+}
+
+.mt-2 {
+    margin-top: 2rem;
+}
+
+.hidden {
+    display: none;
+}
+
+/* Estilos para tablas (preparación para el CRUD) */
+.table-responsive {
+    overflow-x: auto;
+}
+
+table {
+    width: 100%;
+    border-collapse: collapse;
+    margin: 1rem 0;
+}
+
+th, td {
+    padding: 12px 15px;
+    text-align: left;
+    border-bottom: 1px solid #ddd;
+}
+
+th {
+    background-color: #f8f8f8;
+    font-weight: 500;
+}
+
+tr:hover {
+    background-color: #f5f5f5;
 }
