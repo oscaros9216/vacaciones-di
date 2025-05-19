@@ -1,0 +1,52 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Dashboard - Sistema de Colaboradores</title>
+    <link rel="stylesheet" href="css/style.css">
+    <style>
+        .dashboard-container {
+            max-width: 800px;
+            margin: 2rem auto;
+            padding: 2rem;
+            background-color: white;
+            border-radius: 8px;
+            box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+        }
+        header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 2rem;
+        }
+        .btn-logout {
+            padding: 0.5rem 1rem;
+            background-color: #f44336;
+            color: white;
+            border: none;
+            border-radius: 4px;
+            cursor: pointer;
+        }
+        .btn-logout:hover {
+            background-color: #d32f2f;
+        }
+    </style>
+</head>
+<body>
+    <div class="dashboard-container">
+        <header>
+            <h1>Bienvenido al Dashboard</h1>
+            <button id="logoutBtn" class="btn-logout">Cerrar Sesión</button>
+        </header>
+        <main>
+            <div id="userInfo" class="user-info"></div>
+            <div class="dashboard-content">
+                <h2>Módulos del Sistema</h2>
+                <p>Contenido del dashboard irá aquí.</p>
+            </div>
+        </main>
+    </div>
+    <script src="js/dashboard.js"></script>
+</body>
+</html>
