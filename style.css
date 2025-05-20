@@ -205,3 +205,39 @@ input, button {
     margin: 10px 0;
     box-sizing: border-box;
 }
+
+/* Alertas flotantes */
+.alerta-flotante {
+    position: fixed;
+    top: 20px;
+    right: 20px;
+    padding: 15px 25px;
+    border-radius: 5px;
+    color: white;
+    z-index: 1000;
+    opacity: 1;
+    transition: opacity 0.5s;
+    max-width: 300px;
+}
+
+.alerta-success {
+    background-color: #4CAF50;
+}
+
+.alerta-error {
+    background-color: #F44336;
+}
+
+/* Áreas de firma */
+.signature-pad {
+    border: 1px dashed #ccc;
+    background-color: #f9f9f9;
+    touch-action: none;
+}
+
+/* Botones */
+.btn-borrar {
+    margin-top: 10px;
+    background-color: #ff9800;
+    color: white;
+}
