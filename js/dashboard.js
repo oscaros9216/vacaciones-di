@@ -1,6 +1,6 @@
 // Configuración global
 const CONFIG = {
-  APPS_SCRIPT_URL: "https://script.google.com/macros/s/TU_ID_DE_SCRIPT/exec",
+  APPS_SCRIPT_URL: "https://script.google.com/macros/s/AKfycbyI4TwH2l1rrjl5-wR27HRNjRu7jzroC8W5Buf8UasI7Qq2yg0ruGnx9SEzrU5wQTorpA/exec",
   DEBUG_MODE: true
 };
 
