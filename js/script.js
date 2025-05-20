@@ -18,7 +18,7 @@ form.addEventListener("submit", async (e) => {
   const data = Object.fromEntries(formData.entries());
 
   try {
-    await fetch("TU_URL_DE_APP_SCRIPT", {
+    await fetch("https://script.google.com/macros/s/AKfycbzWlLi4JlzZwOI1azLRrGJ4CeTTvSzmzW6caVzA-Kzv100tY66anXS2nxGx7zzXeKRC4A/exec", {
       method: "POST",
       body: JSON.stringify(data),
       headers: { "Content-Type": "application/json" }
