@@ -229,3 +229,84 @@ function checkPasswordStrength() {
   elements.passwordStrength.style.width = `${strength * 25}%`;
   elements.passwordStrength.style.backgroundColor = colors[strength - 1] || '#e53e3e';
 }
+// [Configuración global y variables previas se mantienen igual]
+
+// Función de inicialización del SignaturePad mejorada
+function initSignaturePad() {
+    const canvas = document.getElementById('signaturePad');
+    if (!canvas) {
+        console.error('Canvas para firma no encontrado');
+        return;
+    }
+
+    // Ajustar canvas para alta resolución
+    const ratio = Math.max(window.devicePixelRatio || 1, 1);
+    canvas.width = canvas.offsetWidth * ratio;
+    canvas.height = canvas.offsetHeight * ratio;
+    canvas.getContext('2d').scale(ratio, ratio);
+
+    // Configuración mejorada de SignaturePad
+    signaturePad = new SignaturePad(canvas, {
+        backgroundColor: 'rgb(255, 255, 255)',
+        penColor: 'rgb(0, 0, 0)',
+        minWidth: 1,
+        maxWidth: 2.5,
+        throttle: 16, // Mejor rendimiento en móviles
+        velocityFilterWeight: 0.7,
+        minDistance: 5 // Mejor precisión en móviles
+    });
+
+    // Eventos táctiles mejorados
+    canvas.addEventListener('touchstart', (e) => {
+        e.preventDefault(); // Previene el scroll en móviles
+        const touch = e.touches[0];
+        const mouseEvent = new MouseEvent('mousedown', {
+            clientX: touch.clientX,
+            clientY: touch.clientY
+        });
+        canvas.dispatchEvent(mouseEvent);
+    }, { passive: false });
+
+    canvas.addEventListener('touchmove', (e) => {
+        e.preventDefault(); // Previene el scroll en móviles
+        const touch = e.touches[0];
+        const mouseEvent = new MouseEvent('mousemove', {
+            clientX: touch.clientX,
+            clientY: touch.clientY
+        });
+        canvas.dispatchEvent(mouseEvent);
+    }, { passive: false });
+
+    canvas.addEventListener('touchend', (e) => {
+        e.preventDefault();
+        const mouseEvent = new MouseEvent('mouseup');
+        canvas.dispatchEvent(mouseEvent);
+    }, { passive: false });
+
+    // Redimensionar cuando cambia la orientación del dispositivo
+    window.addEventListener('orientationchange', resizeCanvas);
+    window.addEventListener('resize', resizeCanvas);
+
+    function resizeCanvas() {
+        const canvas = document.getElementById('signaturePad');
+        const ratio = Math.max(window.devicePixelRatio || 1, 1);
+        
+        // Guardar firma actual temporalmente
+        const data = signaturePad.toData();
+        
+        // Ajustar tamaño
+        canvas.width = canvas.offsetWidth * ratio;
+        canvas.height = canvas.offsetHeight * ratio;
+        canvas.getContext('2d').scale(ratio, ratio);
+        
+        // Restaurar firma
+        signaturePad.fromData(data);
+    }
+
+    // Botón limpiar
+    document.getElementById('clearSignature')?.addEventListener('click', () => {
+        signaturePad.clear();
+    });
+}
+
+// [El resto del código JavaScript se mantiene igual]
