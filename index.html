@@ -1,272 +1,143 @@
-<!DOCTYPE html>
-<html lang="es">
-<head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Formulario de Registro - Colaboradores</title>
-    <style>
-        body {
-            font-family: Arial, sans-serif;
-            line-height: 1.6;
-            margin: 0;
-            padding: 20px;
-            background-color: #f5f5f5;
-        }
-        .container {
-            max-width: 800px;
-            margin: 0 auto;
-            background: white;
-            padding: 20px;
-            border-radius: 8px;
-            box-shadow: 0 0 10px rgba(0,0,0,0.1);
-        }
-        h1 {
-            text-align: center;
-            color: #333;
-        }
-        .form-group {
-            margin-bottom: 15px;
-        }
-        label {
-            display: block;
-            margin-bottom: 5px;
-            font-weight: bold;
-        }
-        input, select, textarea {
-            width: 100%;
-            padding: 8px;
-            border: 1px solid #ddd;
-            border-radius: 4px;
-            box-sizing: border-box;
-        }
-        .required:after {
-            content: " *";
-            color: red;
-        }
-        button {
-            background-color: #4CAF50;
-            color: white;
-            padding: 10px 15px;
-            border: none;
-            border-radius: 4px;
-            cursor: pointer;
-            font-size: 16px;
-        }
-        button:hover {
-            background-color: #45a049;
-        }
-        #signature-pad {
-            border: 1px solid #ddd;
-            border-radius: 4px;
-            margin-bottom: 10px;
-        }
-        .signature-container {
-            margin-bottom: 20px;
-        }
-        .clear-signature {
-            background-color: #f44336;
-        }
-    </style>
-</head>
-<body>
-    <div class="container">
-        <h1>Formulario de Registro de Colaboradores</h1>
-        <form id="registro-form">
-            <!-- Información Básica -->
-            <div class="form-group">
-                <label for="rol" class="required">Rol/Puesto</label>
-                <input type="text" id="rol" name="rol" required>
-            </div>
-            
-            <div class="form-group">
-                <label for="nombre" class="required">Nombre del Colaborador</label>
-                <input type="text" id="nombre" name="nombre" required>
-            </div>
-            
-            <div class="form-group">
-                <label for="numero" class="required">Número de Colaborador</label>
-                <input type="text" id="numero" name="numero" required>
-            </div>
-            
-            <div class="form-group">
-                <label for="fecha" class="required">Fecha de Ingreso</label>
-                <input type="date" id="fecha" name="fecha" required>
-            </div>
-            
-            <div class="form-group">
-                <label for="email" class="required">Email Corporativo</label>
-                <input type="email" id="email" name="email" required>
-            </div>
-            
-            <div class="form-group">
-                <label for="password">Contraseña Temporal</label>
-                <input type="password" id="password" name="password">
-            </div>
-            
-            <div class="form-group">
-                <label for="vacaciones" class="required">¿Se autorizan vacaciones?</label>
-                <select id="vacaciones" name="vacaciones" required>
-                    <option value="">Seleccione...</option>
-                    <option value="Sí">Sí</option>
-                    <option value="No">No</option>
-                </select>
-            </div>
-            
-            <!-- Información del Jefe -->
-            <div class="form-group">
-                <label for="jefe" class="required">Jefe Directo</label>
-                <input type="text" id="jefe" name="jefe" required>
-            </div>
-            
-            <div class="form-group">
-                <label for="correoJefe" class="required">Correo del Jefe Directo</label>
-                <input type="email" id="correoJefe" name="correoJefe" required>
-            </div>
-            
-            <!-- Áreas de Firma -->
-            <div class="signature-container">
-                <label class="required">Firma del Colaborador</label>
-                <canvas id="firma-colaborador" width="400" height="200" style="border:1px solid #ddd;"></canvas>
-                <button type="button" id="clear-colaborador" class="clear-signature">Borrar Firma</button>
-            </div>
-            
-            <div class="signature-container">
-                <label class="required">Firma del Jefe Directo</label>
-                <canvas id="firma-jefe" width="400" height="200" style="border:1px solid #ddd;"></canvas>
-                <button type="button" id="clear-jefe" class="clear-signature">Borrar Firma</button>
-            </div>
-            
-            <!-- Información Adicional -->
-            <div class="form-group">
-                <label for="tituloEvento">Título del Evento/Proyecto</label>
-                <input type="text" id="tituloEvento" name="tituloEvento">
-            </div>
-            
-            <div class="form-group">
-                <label for="invitados">Correos de Invitados (separados por comas)</label>
-                <textarea id="invitados" name="invitados" rows="3"></textarea>
-            </div>
-            
-            <div class="form-group">
-                <label for="descripcion">Descripción</label>
-                <textarea id="descripcion" name="descripcion" rows="3"></textarea>
-            </div>
-            
-            <div class="form-group">
-                <label for="mensaje">Mensaje Adicional</label>
-                <textarea id="mensaje" name="mensaje" rows="3"></textarea>
-            </div>
-            
-            <button type="submit" id="btn-enviar">Enviar Formulario</button>
-        </form>
-    </div>
+function doPost(e) {
+  const sheetName = "Colaboradores";
+  const spreadsheetId = "1a4X3m2zcXB0KT6eVl5tKl6WO-O9-pGHbP3hZzGRT3c0";
+  const folderId = "1vYkgKVQCxRc_yKbWaymUThmJWBH0ySdR";
+  
+  try {
+    // Verificar que hay datos
+    if (!e || !e.postData || !e.postData.contents) {
+      throw new Error("No se recibieron datos");
+    }
+    
+    // Parsear los datos JSON
+    const data = JSON.parse(e.postData.contents);
+    
+    // Validar campos obligatorios
+    const requiredFields = [
+      'rol', 'nombre', 'numero', 'fecha', 'email', 
+      'vacaciones', 'jefe', 'correoJefe'
+    ];
+    
+    const missingFields = requiredFields.filter(field => !data[field]);
+    if (missingFields.length > 0) {
+      throw new Error(`Faltan campos obligatorios: ${missingFields.join(', ')}`);
+    }
+    
+    // Preparar los datos para la hoja
+    const rowData = [
+      data.timestamp || new Date().toISOString(), // Columna Id
+      data.rol || '',
+      data.nombre || '',
+      "FIRMA_REGISTRADA", // Firma Colaborador
+      data.numero || '',
+      data.fecha || '',
+      data.email || '',
+      data.password || '',
+      data.vacaciones === 'Sí' ? 'Sí' : 'No',
+      data.jefe || '',
+      data.correoJefe || '',
+      "FIRMA_REGISTRADA", // Firma Jefe directo
+      data.tituloEvento || '',
+      Array.isArray(data.invitados) ? data.invitados.join(', ') : (data.invitados || ''),
+      data.descripcion || '',
+      data.mensaje || ''
+    ];
+    
+    // Obtener la hoja de cálculo
+    const spreadsheet = SpreadsheetApp.openById(spreadsheetId);
+    let sheet = spreadsheet.getSheetByName(sheetName);
+    
+    // Crear hoja si no existe
+    if (!sheet) {
+      sheet = spreadsheet.insertSheet(sheetName);
+      // Establecer los encabezados
+      const headers = [
+        "Id", "Rol", "Nombre del Colaborador", "Firma Colaborador",
+        "Numero de Colaborador", "Fecha de ingreso", "Email", "Contraseña",
+        "Se autorizan vacaciones (Si)", "Jefe directo", "Correo jefe directo",
+        "Firma Jefe directo", "Titulo del evento", "Correos de invitados",
+        "Descripcion", "Mensaje"
+      ];
+      sheet.appendRow(headers);
+    }
+    
+    // Añadir los datos
+    sheet.appendRow(rowData);
+    
+    // Opcional: Guardar las firmas como imágenes en Google Drive
+    try {
+      const folder = DriveApp.getFolderById(folderId);
+      const timestamp = data.timestamp || new Date().toISOString().replace(/[:.]/g, '-');
+      
+      // Guardar firma colaborador
+      if (data.firmaColaborador) {
+        const firmaColab = Utilities.newBlob(
+          Utilities.base64Decode(data.firmaColaborador.split(',')[1]), 
+          'image/png', 
+          `firma-colab-${data.nombre}-${timestamp}.png`
+        );
+        folder.createFile(firmaColab);
+      }
+      
+      // Guardar firma jefe
+      if (data.firmaJefe) {
+        const firmaJefe = Utilities.newBlob(
+          Utilities.base64Decode(data.firmaJefe.split(',')[1]), 
+          'image/png', 
+          `firma-jefe-${data.jefe}-${timestamp}.png`
+        );
+        folder.createFile(firmaJefe);
+      }
+    } catch (driveError) {
+      console.error("Error al guardar firmas en Drive:", driveError);
+      // No detenemos el proceso por este error
+    }
+    
+    // Retornar respuesta exitosa
+    return ContentService.createTextOutput(
+      JSON.stringify({
+        status: 'success',
+        message: 'Datos guardados correctamente en Colaboradores'
+      })
+    ).setMimeType(ContentService.MimeType.JSON);
 
-    <script src="https://cdn.jsdelivr.net/npm/signature_pad@4.0.0/dist/signature_pad.umd.min.js"></script>
-    <script>
-        // Variables para las firmas
-        let signaturePadColaborador, signaturePadJefe;
-        
-        // Inicializar las áreas de firma cuando el DOM esté listo
-        document.addEventListener('DOMContentLoaded', function() {
-            // Configurar firma del colaborador
-            const canvasColaborador = document.getElementById('firma-colaborador');
-            signaturePadColaborador = new SignaturePad(canvasColaborador, {
-                backgroundColor: 'rgba(255, 255, 255, 0)',
-                penColor: 'rgb(0, 0, 0)'
-            });
-            
-            // Configurar firma del jefe
-            const canvasJefe = document.getElementById('firma-jefe');
-            signaturePadJefe = new SignaturePad(canvasJefe, {
-                backgroundColor: 'rgba(255, 255, 255, 0)',
-                penColor: 'rgb(0, 0, 0)'
-            });
-            
-            // Botones para borrar firmas
-            document.getElementById('clear-colaborador').addEventListener('click', function() {
-                signaturePadColaborador.clear();
-            });
-            
-            document.getElementById('clear-jefe').addEventListener('click', function() {
-                signaturePadJefe.clear();
-            });
-            
-            // Configurar el envío del formulario
-            document.getElementById('registro-form').addEventListener('submit', function(e) {
-                e.preventDefault();
-                enviarFormulario();
-            });
-        });
+  } catch (error) {
+    // Retornar error
+    console.error("Error en doPost:", error);
+    return ContentService.createTextOutput(
+      JSON.stringify({
+        status: 'error',
+        message: error.message || 'Error desconocido al procesar la solicitud'
+      })
+    ).setMimeType(ContentService.MimeType.JSON);
+  }
+}
 
-        function enviarFormulario() {
-            const btnEnviar = document.getElementById('btn-enviar');
-            btnEnviar.disabled = true;
-            btnEnviar.textContent = 'Enviando...';
-            
-            // Validar firmas
-            if (signaturePadColaborador.isEmpty() || signaturePadJefe.isEmpty()) {
-                alert('Ambas firmas son requeridas');
-                btnEnviar.disabled = false;
-                btnEnviar.textContent = 'Enviar Formulario';
-                return;
-            }
-            
-            // Obtener datos del formulario
-            const datos = {
-                rol: document.getElementById('rol').value.trim(),
-                nombre: document.getElementById('nombre').value.trim(),
-                numero: document.getElementById('numero').value.trim(),
-                fecha: document.getElementById('fecha').value,
-                email: document.getElementById('email').value.trim(),
-                password: document.getElementById('password').value,
-                vacaciones: document.getElementById('vacaciones').value,
-                jefe: document.getElementById('jefe').value.trim(),
-                correoJefe: document.getElementById('correoJefe').value.trim(),
-                tituloEvento: document.getElementById('tituloEvento').value.trim(),
-                invitados: document.getElementById('invitados').value.split(',').map(item => item.trim()).filter(item => item),
-                descripcion: document.getElementById('descripcion').value.trim(),
-                mensaje: document.getElementById('mensaje').value.trim(),
-                firmaColaborador: signaturePadColaborador.toDataURL('image/png'),
-                firmaJefe: signaturePadJefe.toDataURL('image/png')
-            };
-            
-            // Validar campos requeridos
-            const camposRequeridos = ['rol', 'nombre', 'numero', 'fecha', 'email', 'vacaciones', 'jefe', 'correoJefe'];
-            const camposFaltantes = camposRequeridos.filter(campo => !datos[campo]);
-            
-            if (camposFaltantes.length > 0) {
-                alert(`Faltan campos obligatorios: ${camposFaltantes.join(', ')}`);
-                btnEnviar.disabled = false;
-                btnEnviar.textContent = 'Enviar Formulario';
-                return;
-            }
-            
-            // Enviar datos al Google Apps Script
-            const SCRIPT_URL = "https://script.google.com/macros/s/AKfycbxDoYg7-1BQgLu_IrNr3kUi7KIbr0JJoK9rit2CKxjuokYrDhC7JLXQrTTaMrtcjhbAPg/exec";
-            
-            fetch(SCRIPT_URL, {
-                method: 'POST',
-                body: JSON.stringify(datos),
-                headers: {
-                    'Content-Type': 'application/json'
-                }
-            })
-            .then(response => response.text())
-            .then(data => {
-                alert('Formulario enviado correctamente');
-                document.getElementById('registro-form').reset();
-                signaturePadColaborador.clear();
-                signaturePadJefe.clear();
-            })
-            .catch(error => {
-                console.error('Error:', error);
-                alert('Error al enviar el formulario');
-            })
-            .finally(() => {
-                btnEnviar.disabled = false;
-                btnEnviar.textContent = 'Enviar Formulario';
-            });
-        }
-    </script>
-</body>
-</html>
+// Función de prueba mejorada
+function testDoPost() {
+  const mockData = {
+    postData: {
+      contents: JSON.stringify({
+        rol: "Desarrollador",
+        nombre: "Juan Pérez",
+        numero: "DEV-123",
+        fecha: "2023-01-15",
+        email: "juan@empresa.com",
+        password: "temp123",
+        vacaciones: "Sí",
+        jefe: "María Gómez",
+        correoJefe: "maria@empresa.com",
+        firmaColaborador: "data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAAAEAAAABCAYAAAAfFcSJAAAADUlEQVR42mP8z8BQDwAEhQGAhKmMIQAAAABJRU5ErkJggg==",
+        firmaJefe: "data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAAAEAAAABCAYAAAAfFcSJAAAADUlEQVR42mP8z8BQDwAEhQGAhKmMIQAAAABJRU5ErkJggg==",
+        tituloEvento: "Reunión de equipo",
+        invitados: ["team@empresa.com", "hr@empresa.com"],
+        descripcion: "Revisión de objetivos",
+        mensaje: "Confirmar asistencia",
+        timestamp: new Date().toISOString()
+      })
+    }
+  };
+  
+  const result = doPost(mockData);
+  Logger.log(result.getContent());
+}
