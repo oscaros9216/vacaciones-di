@@ -202,6 +202,7 @@
             <div class="form-group">
                 <label for="vacaciones">¿Se autorizan vacaciones? *</label>
                 <select id="vacaciones" name="vacaciones" required>
+                    <option value="">Seleccione...</option>
                     <option value="Sí">Sí</option>
                     <option value="No">No</option>
                 </select>
@@ -260,7 +261,7 @@
     <!-- Incluir SignaturePad desde CDN -->
     <script src="https://cdn.jsdelivr.net/npm/signature_pad@4.1.6/dist/signature_pad.umd.min.js"></script>
     
-    <!-- Nuestro script (debe ir al final del body) -->
+    <!-- Script completo para el formulario -->
     <script>
         // Variables globales para las firmas
         let firmaColaborador, firmaJefe;
@@ -314,50 +315,72 @@
                     throw new Error('Ambas firmas son requeridas');
                 }
                 
-                // 2. Obtener datos del formulario
+                // 2. Validar select de vacaciones
+                const selectVacaciones = document.getElementById('vacaciones');
+                if (!selectVacaciones.value) {
+                    throw new Error('Debe seleccionar una opción para vacaciones');
+                }
+                
+                // 3. Obtener datos del formulario
                 const datosFormulario = {
-                    rol: document.getElementById('rol').value,
-                    nombre: document.getElementById('nombre').value,
-                    numero: document.getElementById('numero').value,
+                    rol: document.getElementById('rol').value.trim(),
+                    nombre: document.getElementById('nombre').value.trim(),
+                    numero: document.getElementById('numero').value.trim(),
                     fecha: document.getElementById('fecha').value,
-                    email: document.getElementById('email').value,
+                    email: document.getElementById('email').value.trim(),
                     password: document.getElementById('password').value,
-                    vacaciones: document.getElementById('vacaciones').value,
-                    jefe: document.getElementById('jefe').value,
-                    correoJefe: document.getElementById('correoJefe').value,
-                    tituloEvento: document.getElementById('tituloEvento').value,
-                    invitados: document.getElementById('invitados').value.split(',').map(item => item.trim()),
-                    descripcion: document.getElementById('descripcion').value,
-                    mensaje: document.getElementById('mensaje').value,
+                    vacaciones: selectVacaciones.value,
+                    jefe: document.getElementById('jefe').value.trim(),
+                    correoJefe: document.getElementById('correoJefe').value.trim(),
+                    tituloEvento: document.getElementById('tituloEvento').value.trim(),
+                    invitados: document.getElementById('invitados').value.split(',').map(item => item.trim()).filter(item => item),
+                    descripcion: document.getElementById('descripcion').value.trim(),
+                    mensaje: document.getElementById('mensaje').value.trim(),
                     firmaColaborador: firmaColaborador.toDataURL('image/png'),
                     firmaJefe: firmaJefe.toDataURL('image/png')
                 };
                 
-                // 3. Validar campos requeridos
-                const camposRequeridos = ['rol', 'nombre', 'numero', 'fecha', 'email', 'jefe', 'correoJefe'];
+                // 4. Validar campos requeridos
+                const camposRequeridos = ['rol', 'nombre', 'numero', 'fecha', 'email', 'jefe', 'correoJefe', 'vacaciones'];
                 const camposFaltantes = camposRequeridos.filter(campo => !datosFormulario[campo]);
                 
                 if (camposFaltantes.length > 0) {
                     throw new Error(`Faltan campos obligatorios: ${camposFaltantes.join(', ')}`);
                 }
                 
-                // 4. Enviar datos al backend (Google Apps Script)
-                const SCRIPT_URL = "https://script.google.com/macros/s/AKfycbxDoYg7-1BQgLu_IrNr3kUi7KIbr0JJoK9rit2CKxjuokYrDhC7JLXQrTTaMrtcjhbAPg/exec"; // Reemplazar con tu URL
+                // 5. Enviar datos al backend (Google Apps Script)
+                const SCRIPT_URL = "https://script.google.com/macros/s/AKfycbxDoYg7-1BQgLu_IrNr3kUi7KIbr0JJoK9rit2CKxjuokYrDhC7JLXQrTTaMrtcjhbAPg/exec";
                 
                 const response = await fetch(SCRIPT_URL, {
                     method: 'POST',
                     body: JSON.stringify(datosFormulario),
                     headers: {
-                        'Content-Type': 'text/plain' // Importante para Google Apps Script
-                    },
-                    mode: 'no-cors'
+                        'Content-Type': 'text/plain;charset=utf-8'
+                    }
                 });
                 
-                // 5. Mostrar feedback al usuario
-                mostrarAlerta('Formulario enviado correctamente a Colaboradores', 'success');
+                // 6. Procesar respuesta (aunque sea no-CORS)
+                let resultado;
+                try {
+                    resultado = await response.text();
+                    try {
+                        resultado = JSON.parse(resultado);
+                    } catch (e) {
+                        // Si no se puede parsear como JSON, usar el texto directo
+                        resultado = { message: resultado };
+                    }
+                } catch (error) {
+                    console.error('Error al procesar respuesta:', error);
+                    resultado = { status: 'unknown', message: 'Respuesta no procesable' };
+                }
                 
-                // 6. Limpiar formulario
-                resetearFormulario();
+                // 7. Mostrar feedback al usuario
+                if (resultado.status === 'success') {
+                    mostrarAlerta('Formulario enviado correctamente a Colaboradores', 'success');
+                    resetearFormulario();
+                } else {
+                    throw new Error(resultado.message || 'Error desconocido al enviar el formulario');
+                }
                 
             } catch (error) {
                 console.error('Error en el envío:', error);
