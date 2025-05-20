@@ -16,7 +16,8 @@ const elements = {
   cancelBtn: document.getElementById('cancelBtn'),
   logoutBtn: document.getElementById('logoutBtn'),
   formMessage: document.getElementById('formMessage'),
-  passwordStrength: document.getElementById('passwordStrength')
+  passwordStrength: document.getElementById('passwordStrength'),
+  clearSignatureBtn: document.getElementById('clearSignature')
 };
 
 // Inicialización al cargar la página
@@ -60,27 +61,29 @@ async function sendToGoogleScript(data) {
   }
 }
 
-// =============================================
-// MANEJO DEL FORMULARIO DE REGISTRO (VERSIÓN MEJORADA)
-// =============================================
+// Manejo del formulario de registro
 async function handleFormSubmit(e) {
   e.preventDefault();
   const submitBtn = e.target.querySelector('button[type="submit"]');
   const originalText = submitBtn.innerHTML;
   
   try {
-    // 1. Validaciones
-    if (signaturePad.isEmpty()) throw new Error("✍️ Debes proporcionar tu firma");
+    // Validaciones
+    if (!signaturePad || signaturePad.isEmpty()) {
+      throw new Error("✍️ Debes proporcionar tu firma");
+    }
 
     const password = document.getElementById('password').value;
-    if (password.length < 4) throw new Error("La contraseña debe tener al menos 4 caracteres");
+    if (password.length < 4) {
+      throw new Error("La contraseña debe tener al menos 4 caracteres");
+    }
 
-    // 2. Mostrar estado de carga
+    // Mostrar estado de carga
     submitBtn.disabled = true;
     submitBtn.innerHTML = '<i class="bi bi-arrow-repeat spin"></i> Guardando...';
     showMessage("⏳ Guardando información...", "loading");
 
-    // 3. Preparar datos con todos los campos
+    // Preparar datos
     const formData = {
       action: 'saveUserData',
       id: generateUserId(),
@@ -91,7 +94,7 @@ async function handleFormSubmit(e) {
       fecha_ingreso: document.getElementById('hireDate').value,
       email: document.getElementById('email').value,
       contraseña: password,
-      vacaciones: document.getElementById('vacationAuth').value || "Si",
+      vacaciones: document.getElementById('vacationAuth').value,
       jefe_directo: document.getElementById('managerName').value,
       correo_jefe: document.getElementById('managerEmail').value,
       titulo_evento: document.getElementById('eventTitle').value || '',
@@ -100,174 +103,11 @@ async function handleFormSubmit(e) {
       mensaje: document.getElementById('message').value || ''
     };
     
-    console.log("Datos a enviar:", formData); // Debug
+    console.log("Datos a enviar:", formData);
 
-    // 4. Enviar datos
+    // Enviar datos
     const response = await sendToGoogleScript(formData);
-    console.log("Respuesta del servidor:", response); // Debug
+    console.log("Respuesta del servidor:", response);
     
-    // 5. Mostrar resultado
+    // Mostrar resultado
     showMessage("✅ " + response.message, "success");
-    setTimeout(() => {
-      hideRegisterForm();
-      resetForm();
-    }, 1500);
-
-  } catch (error) {
-    console.error("Error en el formulario:", error);
-    showMessage(`❌ Error: ${error.message}`, "error");
-    elements.registerForm.classList.add('shake');
-    setTimeout(() => elements.registerForm.classList.remove('shake'), 500);
-  } finally {
-    submitBtn.disabled = false;
-    submitBtn.innerHTML = originalText;
-  }
-}
-
-// =============================================
-// FUNCIONES AUXILIARES
-// =============================================
-
-function generateUserId() {
-  return `USR-${Date.now().toString().slice(-6)}-${Math.floor(Math.random() * 1000).toString().padStart(3, '0')}`;
-}
-
-function showRegisterForm() {
-  console.log('Mostrando formulario de registro');
-  elements.optionsPanel.style.display = 'none';
-  elements.registerFormPanel.style.display = 'block';
-  document.getElementById('userId').value = generateUserId();
-}
-
-function hideRegisterForm() {
-  console.log('Ocultando formulario de registro');
-  elements.registerFormPanel.style.display = 'none';
-  elements.optionsPanel.style.display = 'grid';
-}
-
-function resetForm() {
-  elements.registerForm.reset();
-  signaturePad.clear();
-  elements.passwordStrength.style.width = '0%';
-}
-
-function checkSession() {
-  const isLoggedIn = localStorage.getItem('isLoggedIn') === 'true';
-  const userEmail = localStorage.getItem('userEmail');
-
-  if (!isLoggedIn || !userEmail) {
-    console.log('No hay sesión activa, redirigiendo...');
-    redirectToLogin();
-  } else {
-    document.getElementById('userEmail').textContent = userEmail;
-    console.log('Sesión activa para:', userEmail);
-  }
-}
-
-function initUI() {
-  console.log('Inicializando UI...');
-  
-  if (elements.registerUserBtn) {
-    elements.registerUserBtn.addEventListener('click', showRegisterForm);
-    console.log('Event listener agregado a registerUserBtn');
-  }
-
-  if (elements.cancelBtn) {
-    elements.cancelBtn.addEventListener('click', hideRegisterForm);
-    console.log('Event listener agregado a cancelBtn');
-  }
-
-  if (elements.logoutBtn) {
-    elements.logoutBtn.addEventListener('click', logout);
-    console.log('Event listener agregado a logoutBtn');
-  }
-
-  if (document.getElementById('password')) {
-    document.getElementById('password').addEventListener('input', checkPasswordStrength);
-    console.log('Event listener agregado a password');
-  }
-
-  if (elements.registerForm) {
-    elements.registerForm.addEventListener('submit', handleFormSubmit);
-    console.log('Event listener agregado a registerForm');
-  }
-}
-
-function initSignaturePad() {
-  console.log('Inicializando SignaturePad...');
-  const canvas = document.getElementById('signaturePad');
-  
-  if (!canvas) {
-    console.error('No se encontró el canvas para la firma');
-    return;
-  }
-
-  signaturePad = new SignaturePad(canvas, {
-    backgroundColor: 'rgb(255, 255, 255)',
-    penColor: 'rgb(0, 0, 0)',
-    minWidth: 1,
-    maxWidth: 3
-  });
-
-  function resizeCanvas() {
-    const ratio = Math.max(window.devicePixelRatio || 1, 1);
-    canvas.width = canvas.offsetWidth * ratio;
-    canvas.height = canvas.offsetHeight * ratio;
-    canvas.getContext('2d').scale(ratio, ratio);
-    signaturePad.clear();
-  }
-
-  window.addEventListener('resize', resizeCanvas);
-  resizeCanvas();
-
-  const clearButton = document.getElementById('clearSignature');
-  if (clearButton) {
-    clearButton.addEventListener('click', () => {
-      signaturePad.clear();
-    });
-    console.log('Event listener agregado a clearSignature');
-  }
-}
-
-function logout() {
-  console.log('Cerrando sesión...');
-  localStorage.removeItem('isLoggedIn');
-  localStorage.removeItem('userEmail');
-  localStorage.removeItem('userRole');
-  redirectToLogin();
-}
-
-function redirectToLogin() {
-  window.location.href = "index.html";
-}
-
-function showMessage(text, type) {
-  if (elements.formMessage) {
-    elements.formMessage.textContent = text;
-    elements.formMessage.className = `form-message ${type}`;
-    
-    if (type !== 'success' && type !== 'loading') {
-      setTimeout(() => {
-        elements.formMessage.classList.remove('show');
-      }, 5000);
-    }
-  }
-}
-
-function checkPasswordStrength() {
-  const password = this.value;
-  let strength = 0;
-  
-  if (password.length >= 4) strength++;
-  if (/\d/.test(password)) strength++;
-  if (/[A-Za-z]/.test(password)) strength++;
-  if (/[^A-Za-z0-9]/.test(password)) strength++;
-
-  const colors = ['#e53e3e', '#f6ad55', '#68d391', '#38a169'];
-  elements.passwordStrength.style.width = `${strength * 25}%`;
-  elements.passwordStrength.style.backgroundColor = colors[strength - 1] || '#e53e3e';
-}
-
-// Para depuración
-window.debugElements = elements;
-console.log('Dashboard.js cargado correctamente');
