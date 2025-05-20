@@ -177,3 +177,31 @@ canvas {
         height: 150px;
     }
 }
+/* Asegura que los elementos sean visibles */
+#registro-form {
+    max-width: 600px;
+    margin: 0 auto;
+    padding: 20px;
+}
+
+.firma-container {
+    margin: 20px 0;
+    padding: 15px;
+    border: 1px solid #ddd;
+    border-radius: 5px;
+}
+
+.firma-container canvas {
+    width: 100%;
+    height: 150px;
+    border: 1px dashed #aaa;
+    background: #f9f9f9;
+}
+
+input, button {
+    display: block;
+    width: 100%;
+    padding: 10px;
+    margin: 10px 0;
+    box-sizing: border-box;
+}
