@@ -4,6 +4,7 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Login - Sistema de Colaboradores</title>
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.10.0/font/bootstrap-icons.css">
     <link rel="stylesheet" href="css/style.css">
 </head>
 <body>
@@ -16,9 +17,9 @@
             </div>
             <div class="form-group">
                 <label for="password" class="form-label">Contraseña</label>
-                <input type="password" id="password" class="form-input" placeholder="••••••••" required>
+                <input type="password" id="password" class="form-input" placeholder="••••••••" required minlength="6">
                 <div class="forgot-password">
-                    <a href="#">¿Olvidaste tu contraseña?</a>
+                    <a href="#" id="forgotPasswordLink">¿Olvidaste tu contraseña?</a>
                 </div>
             </div>
             <button type="submit" class="login-btn">Ingresar</button>
