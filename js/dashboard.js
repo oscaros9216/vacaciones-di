@@ -111,3 +111,121 @@ async function handleFormSubmit(e) {
     
     // Mostrar resultado
     showMessage("✅ " + response.message, "success");
+    setTimeout(() => {
+      hideRegisterForm();
+      resetForm();
+    }, 1500);
+
+  } catch (error) {
+    console.error("Error en el formulario:", error);
+    showMessage(`❌ Error: ${error.message}`, "error");
+    elements.registerForm.classList.add('shake');
+    setTimeout(() => elements.registerForm.classList.remove('shake'), 500);
+  } finally {
+    submitBtn.disabled = false;
+    submitBtn.innerHTML = originalText;
+  }
+}
+
+// Funciones auxiliares
+function generateUserId() {
+  return `USR-${Date.now().toString().slice(-6)}-${Math.floor(Math.random() * 1000).toString().padStart(3, '0')}`;
+}
+
+function showRegisterForm() {
+  elements.optionsPanel.style.display = 'none';
+  elements.registerFormPanel.style.display = 'block';
+  document.getElementById('userId').value = generateUserId();
+}
+
+function hideRegisterForm() {
+  elements.registerFormPanel.style.display = 'none';
+  elements.optionsPanel.style.display = 'grid';
+}
+
+function resetForm() {
+  elements.registerForm.reset();
+  if (signaturePad) signaturePad.clear();
+  elements.passwordStrength.style.width = '0%';
+}
+
+function checkSession() {
+  const isLoggedIn = localStorage.getItem('isLoggedIn') === 'true';
+  const userEmail = localStorage.getItem('userEmail');
+
+  if (!isLoggedIn || !userEmail) {
+    redirectToLogin();
+  } else {
+    document.getElementById('userEmail').textContent = userEmail;
+  }
+}
+
+function initUI() {
+  // Event listeners
+  elements.registerUserBtn?.addEventListener('click', showRegisterForm);
+  elements.cancelBtn?.addEventListener('click', hideRegisterForm);
+  elements.logoutBtn?.addEventListener('click', logout);
+  elements.clearSignatureBtn?.addEventListener('click', () => signaturePad?.clear());
+  
+  document.getElementById('password')?.addEventListener('input', checkPasswordStrength);
+  elements.registerForm?.addEventListener('submit', handleFormSubmit);
+}
+
+function initSignaturePad() {
+  const canvas = document.getElementById('signaturePad');
+  
+  if (!canvas) {
+    console.error('Canvas para firma no encontrado');
+    return;
+  }
+
+  signaturePad = new SignaturePad(canvas, {
+    backgroundColor: 'rgb(255, 255, 255)',
+    penColor: 'rgb(0, 0, 0)',
+    minWidth: 1,
+    maxWidth: 3
+  });
+
+  function resizeCanvas() {
+    const ratio = Math.max(window.devicePixelRatio || 1, 1);
+    canvas.width = canvas.offsetWidth * ratio;
+    canvas.height = canvas.offsetHeight * ratio;
+    canvas.getContext('2d').scale(ratio, ratio);
+    signaturePad.clear();
+  }
+
+  window.addEventListener('resize', resizeCanvas);
+  resizeCanvas();
+}
+
+function logout() {
+  localStorage.removeItem('isLoggedIn');
+  localStorage.removeItem('userEmail');
+  localStorage.removeItem('userRole');
+  redirectToLogin();
+}
+
+function redirectToLogin() {
+  window.location.href = "index.html";
+}
+
+function showMessage(text, type) {
+  if (elements.formMessage) {
+    elements.formMessage.textContent = text;
+    elements.formMessage.className = `form-message ${type}`;
+  }
+}
+
+function checkPasswordStrength() {
+  const password = this.value;
+  let strength = 0;
+  
+  if (password.length >= 4) strength++;
+  if (/\d/.test(password)) strength++;
+  if (/[A-Za-z]/.test(password)) strength++;
+  if (/[^A-Za-z0-9]/.test(password)) strength++;
+
+  const colors = ['#e53e3e', '#f6ad55', '#68d391', '#38a169'];
+  elements.passwordStrength.style.width = `${strength * 25}%`;
+  elements.passwordStrength.style.backgroundColor = colors[strength - 1] || '#e53e3e';
+}
