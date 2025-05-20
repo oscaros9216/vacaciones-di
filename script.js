@@ -40,7 +40,7 @@ async function handleSubmit(e) {
     };
     
     // URL de tu Apps Script (¡IMPORTANTE: REEMPLAZA ESTO!)
-    const SCRIPT_URL = "https://script.google.com/macros/s/AKfycbyqAIH0S-dtKzHrtoQUu36y3Mbd-6tJCJ-Il-dcoePHOdEpCqHdN9H6VKTN3_jYyRgxvg/exec";
+    const SCRIPT_URL = "https://script.google.com/macros/s/AKfycbxDoYg7-1BQgLu_IrNr3kUi7KIbr0JJoK9rit2CKxjuokYrDhC7JLXQrTTaMrtcjhbAPg/exec";
     
     // Enviar datos
     const response = await fetch(SCRIPT_URL, {
