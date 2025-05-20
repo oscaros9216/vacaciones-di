@@ -1,87 +1,137 @@
 const APPS_SCRIPT_URL = "https://script.google.com/macros/s/AKfycbzPWDLF1oxRpIFr25HH52lC4pu91lumsKTmwf7KVziU-QOKkf8kI0izrwBxEpfGuGwjbw/exec";
+const SESSION_TIMEOUT = 30 * 60 * 1000; // 30 minutos
 
-document.getElementById('loginForm').addEventListener('submit', async function(e) {
+// Elementos del DOM
+const elements = {
+    loginForm: document.getElementById('loginForm'),
+    emailInput: document.getElementById('email'),
+    passwordInput: document.getElementById('password'),
+    messageDiv: document.getElementById('message'),
+    loginBtn: document.querySelector('.login-btn'),
+    forgotPasswordLink: document.getElementById('forgotPasswordLink')
+};
+
+// Verificar si ya está autenticado
+if (localStorage.getItem('isLoggedIn') {
+    const lastActivity = localStorage.getItem('lastActivity');
+    const currentTime = new Date().getTime();
+    
+    if (lastActivity && (currentTime - parseInt(lastActivity) < SESSION_TIMEOUT)) {
+        redirectToDashboard();
+    } else {
+        clearSession();
+    }
+}
+
+// Event listeners
+elements.loginForm.addEventListener('submit', handleLogin);
+elements.forgotPasswordLink.addEventListener('click', handleForgotPassword);
+
+async function handleLogin(e) {
     e.preventDefault();
     
-    const email = document.getElementById('email').value.trim();
-    const password = document.getElementById('password').value;
-    const messageDiv = document.getElementById('message');
-    const loginBtn = document.querySelector('.login-btn');
+    const email = elements.emailInput.value.trim();
+    const password = elements.passwordInput.value;
     
-    // Mostrar estado de carga
-    showMessage("Verificando credenciales...", "loading");
-    loginBtn.disabled = true;
-    loginBtn.innerHTML = '<span class="loading-spinner"></span> Procesando...';
-    
-    // Validación básica del cliente
+    // Validación del cliente
     if (!email || !password) {
         showMessage("Por favor complete todos los campos", "error");
-        loginBtn.disabled = false;
-        loginBtn.textContent = "Ingresar";
-        document.getElementById('loginForm').classList.add('shake');
-        setTimeout(() => {
-            document.getElementById('loginForm').classList.remove('shake');
-        }, 500);
+        shakeForm();
         return;
     }
-    
+
+    // Mostrar estado de carga
+    showMessage("Verificando credenciales...", "loading");
+    setLoadingState(true);
+
     try {
-        const url = `${APPS_SCRIPT_URL}?action=validateLogin&email=${encodeURIComponent(email)}&password=${encodeURIComponent(password)}`;
+        const response = await sendLoginRequest(email, password);
         
-        const response = await fetch(url, {
-            method: 'GET',
-            redirect: 'follow',
-            headers: {
-                'Content-Type': 'text/plain;charset=utf-8',
-            }
-        });
-        
-        let data;
-        if (response.redirected) {
-            const redirectedResponse = await fetch(response.url);
-            data = await redirectedResponse.json();
-        } else {
-            data = await response.json();
-        }
-        
-        if (data.success) {
+        if (response.success) {
+            // Guardar datos de sesión
+            saveSessionData(response);
             showMessage("¡Inicio de sesión exitoso! Redirigiendo...", "success");
             
-            // Guardar datos de sesión
-            localStorage.setItem('userEmail', data.email);
-            localStorage.setItem('userRole', data.role);
-            localStorage.setItem('isLoggedIn', 'true');
-            
             // Redirigir después de 1.5 segundos
-            setTimeout(() => {
-                window.location.href = "dashboard.html";
-            }, 1500);
+            setTimeout(redirectToDashboard, 1500);
         } else {
-            showMessage(data.message || "Credenciales incorrectas", "error");
-            loginBtn.disabled = false;
-            loginBtn.textContent = "Ingresar";
-            document.getElementById('loginForm').classList.add('shake');
-            setTimeout(() => {
-                document.getElementById('loginForm').classList.remove('shake');
-            }, 500);
+            throw new Error(response.message || "Credenciales incorrectas");
         }
     } catch (error) {
-        console.error("Error en la solicitud:", error);
-        showMessage("Error al conectar con el servidor. Intente nuevamente.", "error");
-        loginBtn.disabled = false;
-        loginBtn.textContent = "Ingresar";
+        showMessage(error.message, "error");
+        shakeForm();
+        setLoadingState(false);
     }
-});
+}
+
+async function sendLoginRequest(email, password) {
+    const data = {
+        action: 'validateLogin',
+        email: email,
+        password: password
+    };
+
+    const response = await fetch(APPS_SCRIPT_URL, {
+        method: 'POST',
+        headers: {
+            'Content-Type': 'application/json'
+        },
+        body: JSON.stringify(data)
+    });
+
+    if (!response.ok) {
+        throw new Error("Error en la conexión con el servidor");
+    }
+
+    return await response.json();
+}
+
+function saveSessionData(response) {
+    localStorage.setItem('isLoggedIn', 'true');
+    localStorage.setItem('userEmail', response.email);
+    localStorage.setItem('userRole', response.role);
+    localStorage.setItem('userName', response.name);
+    localStorage.setItem('lastActivity', new Date().getTime());
+}
+
+function clearSession() {
+    localStorage.removeItem('isLoggedIn');
+    localStorage.removeItem('userEmail');
+    localStorage.removeItem('userRole');
+    localStorage.removeItem('userName');
+    localStorage.removeItem('lastActivity');
+}
+
+function redirectToDashboard() {
+    window.location.href = "dashboard.html";
+}
+
+function handleForgotPassword(e) {
+    e.preventDefault();
+    showMessage("Por favor contacte al administrador del sistema para restablecer su contraseña", "info");
+}
 
 function showMessage(text, type) {
-    const messageDiv = document.getElementById('message');
-    messageDiv.textContent = text;
-    messageDiv.className = `login-message message-${type} show`;
+    elements.messageDiv.textContent = text;
+    elements.messageDiv.className = `login-message message-${type} show`;
     
-    // Auto-ocultar mensajes después de 5 segundos (excepto success)
     if (type !== 'success' && type !== 'loading') {
         setTimeout(() => {
-            messageDiv.classList.remove('show');
+            elements.messageDiv.classList.remove('show');
         }, 5000);
     }
+}
+
+function setLoadingState(isLoading) {
+    elements.loginBtn.disabled = isLoading;
+    elements.loginBtn.innerHTML = isLoading 
+        ? '<span class="loading-spinner"></span> Procesando...' 
+        : 'Ingresar';
+}
+
+function shakeForm() {
+    elements.loginForm.classList.add('shake');
+    setTimeout(() => {
+        elements.loginForm.classList.remove('shake');
+    }, 500);
 }
