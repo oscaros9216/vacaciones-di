@@ -1,80 +1,33 @@
-// Configuración de firmas
-const firmaColaborador = new SignaturePad(document.getElementById('firma-colaborador'));
-const firmaJefe = new SignaturePad(document.getElementById('firma-jefe'));
-
-// Función para mostrar mensajes
-function showAlert(message, type = 'error') {
-  const alertDiv = document.createElement('div');
-  alertDiv.className = `alert ${type}`;
-  alertDiv.textContent = message;
-  
-  document.body.appendChild(alertDiv);
-  
-  setTimeout(() => alertDiv.remove(), 5000);
-}
-
-// Función para enviar el formulario
-async function handleSubmit(e) {
+document.getElementById('registro-form').addEventListener('submit', async function(e) {
   e.preventDefault();
   
-  const form = e.target;
-  const submitBtn = form.querySelector('button[type="submit"]');
-  
-  // Deshabilitar botón durante el envío
-  submitBtn.disabled = true;
-  submitBtn.textContent = 'Enviando...';
-  
+  const formData = {
+    nombre: this.nombre.value,
+    email: this.email.value,
+    firmaColaborador: firmaColaborador.toDataURL(), // Asume que tienes SignaturePad
+    firmaJefe: firmaJefe.toDataURL()
+  };
+
   try {
-    // Validar firmas
-    if (firmaColaborador.isEmpty() || firmaJefe.isEmpty()) {
-      throw new Error('Debes completar ambas firmas');
-    }
-    
-    // Preparar datos
-    const formData = {
-      nombre: form.nombre.value,
-      email: form.email.value,
-      firmaColaborador: firmaColaborador.toDataURL(),
-      firmaJefe: firmaJefe.toDataURL(),
-      // Agrega aquí todos los demás campos
-    };
-    
-    // URL de tu Apps Script (¡IMPORTANTE: REEMPLAZA ESTO!)
-    const SCRIPT_URL = "https://script.google.com/macros/s/AKfycbxDoYg7-1BQgLu_IrNr3kUi7KIbr0JJoK9rit2CKxjuokYrDhC7JLXQrTTaMrtcjhbAPg/exec";
-    
-    // Enviar datos
-    const response = await fetch(SCRIPT_URL, {
+    const response = await fetch('https://script.google.com/macros/s/AKfycbxDoYg7-1BQgLu_IrNr3kUi7KIbr0JJoK9rit2CKxjuokYrDhC7JLXQrTTaMrtcjhbAPg/exec', {
       method: 'POST',
       body: JSON.stringify(formData),
       headers: {
         'Content-Type': 'application/json'
-      },
-      redirect: 'follow' // Importante para Apps Script
+      }
     });
     
-    // Procesar respuesta
     const result = await response.json();
+    console.log("Respuesta del servidor:", result);
+    alert(result.message); // Muestra "Datos guardados correctamente"
     
-    if (result.status === 'error') {
-      throw new Error(result.message);
-    }
-    
-    // Éxito
-    showAlert('¡Formulario enviado con éxito!', 'success');
-    form.reset();
+    // Limpiar formulario después del éxito
+    this.reset();
     firmaColaborador.clear();
     firmaJefe.clear();
     
   } catch (error) {
-    console.error('Error:', error);
-    showAlert(error.message || 'Error al enviar el formulario');
-    
-  } finally {
-    // Restaurar botón
-    submitBtn.disabled = false;
-    submitBtn.textContent = 'Enviar';
+    console.error("Error al enviar:", error);
+    alert("Error: " + error.message);
   }
-}
-
-// Asignar evento al formulario
-document.getElementById('registro-form').addEventListener('submit', handleSubmit);
+});
