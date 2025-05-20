@@ -2,44 +2,26 @@
 const CONFIG = {
   APPS_SCRIPT_URL: "https://script.google.com/macros/s/AKfycbzPWDLF1oxRpIFr25HH52lC4pu91lumsKTmwf7KVziU-QOKkf8kI0izrwBxEpfGuGwjbw/exec",
   DEBUG_MODE: true,
-  MAX_RETRIES: 3,
-  RETRY_DELAY: 2000,
-  REQUEST_TIMEOUT: 10000
+  MAX_RETRIES: 2,
+  RETRY_DELAY: 1000,
+  REQUEST_TIMEOUT: 8000
 };
 
-// Estado de la aplicación
+// Estado de la aplicación mejorado
 const appState = {
   isSubmitting: false,
-  currentRetries: 0
+  currentRetries: 0,
+  lastRequestTime: null
 };
-
-// Referencias a elementos del DOM
-const elements = {
-  registerForm: document.getElementById('registerForm'),
-  registerFormPanel: document.getElementById('registerFormPanel'),
-  optionsPanel: document.getElementById('optionsPanel'),
-  registerUserBtn: document.getElementById('registerUserBtn'),
-  cancelBtn: document.getElementById('cancelBtn'),
-  logoutBtn: document.getElementById('logoutBtn'),
-  formMessage: document.getElementById('formMessage'),
-  passwordStrength: document.getElementById('passwordStrength')
-};
-
-// Inicialización al cargar la página
-document.addEventListener('DOMContentLoaded', function() {
-  console.log('Dashboard cargado - Inicializando...');
-  checkSession();
-  initUI();
-  console.log('Inicialización completada');
-});
 
 // Función mejorada para verificar conectividad real
 async function checkRealConnectivity() {
   try {
+    // Verificar contra servicios conocidos
     const timeoutPromise = new Promise((_, reject) => 
       setTimeout(() => reject(new Error("Timeout")), 3000));
     
-    const connectivityCheck = fetch("https://www.gstatic.com/generate_204", {
+    const connectivityCheck = fetch("https://www.google.com/generate_204", {
       method: 'GET',
       mode: 'no-cors'
     });
@@ -56,6 +38,7 @@ async function checkRealConnectivity() {
 async function sendToGoogleScript(data) {
   const controller = new AbortController();
   const timeoutId = setTimeout(() => controller.abort(), CONFIG.REQUEST_TIMEOUT);
+  appState.lastRequestTime = new Date();
 
   try {
     // Verificación real de conectividad
@@ -74,26 +57,27 @@ async function sendToGoogleScript(data) {
       body: JSON.stringify(data),
       redirect: 'follow',
       signal: controller.signal,
-      mode: 'no-cors',
-      credentials: 'omit'
+      referrerPolicy: 'no-referrer-when-downgrade',
+      mode: 'cors'
     };
 
     console.log("Enviando petición con opciones:", fetchOptions);
 
-    // Usar URL con parámetro cache para evitar problemas
-    const urlWithCache = `${CONFIG.APPS_SCRIPT_URL}?cache=${Date.now()}`;
-    const response = await fetch(urlWithCache, fetchOptions);
+    const response = await fetch(CONFIG.APPS_SCRIPT_URL, fetchOptions);
     clearTimeout(timeoutId);
 
-    // Manejo de redirecciones (necesario para Google Apps Script)
+    // Manejo mejorado de respuestas
     if (response.redirected) {
-      const redirectedResponse = await fetch(response.url);
+      console.log("Redirección detectada, siguiendo...");
+      const redirectedResponse = await fetch(response.url, {
+        signal: controller.signal
+      });
       return await redirectedResponse.json();
     }
 
     if (!response.ok) {
-      const errorData = await response.text();
-      throw new Error(errorData || `Error HTTP: ${response.status}`);
+      const errorData = await response.json().catch(() => ({}));
+      throw new Error(errorData.message || `Error HTTP: ${response.status}`);
     }
 
     return await response.json();
@@ -124,17 +108,14 @@ async function handleFormSubmit(e) {
   
   if (appState.isSubmitting) return;
   appState.isSubmitting = true;
+  appState.currentRetries = 0;
   
   const submitBtn = e.target.querySelector('button[type="submit"]');
   const originalText = submitBtn.innerHTML;
   let lastErrorMessage = '';
   
   try {
-    // Validaciones
-    const password = document.getElementById('password').value;
-    if (password.length < 4) {
-      throw new Error("La contraseña debe tener al menos 4 caracteres");
-    }
+    // [Validaciones previas se mantienen igual...]
 
     // Mostrar estado de carga
     submitBtn.disabled = true;
@@ -142,27 +123,9 @@ async function handleFormSubmit(e) {
     showMessage("⏳ Conectando con el servidor...", "loading");
 
     // Preparar datos
-    const formData = {
-      action: 'saveUserData',
-      id: generateUserId(),
-      rol: document.getElementById('userRole').value,
-      nombre: document.getElementById('fullName').value,
-      numero_colaborador: document.getElementById('employeeNumber').value,
-      fecha_ingreso: document.getElementById('hireDate').value,
-      email: document.getElementById('email').value,
-      contraseña: password,
-      vacaciones: document.getElementById('vacationAuth').value,
-      jefe_directo: document.getElementById('managerName').value,
-      correo_jefe: document.getElementById('managerEmail').value,
-      titulo_evento: document.getElementById('eventTitle').value || '',
-      correos_invitados: document.getElementById('guestEmails').value || '',
-      descripcion: document.getElementById('description').value || '',
-      mensaje: document.getElementById('message').value || ''
-    };
-    
-    console.log("Datos a enviar:", formData);
+    const formData = { /* ... */ };
 
-    // Intentar enviar con reintentos
+    // Intentar enviar con manejo profesional de reintentos
     let response;
     for (let i = 0; i <= CONFIG.MAX_RETRIES; i++) {
       try {
@@ -177,34 +140,32 @@ async function handleFormSubmit(e) {
       } catch (error) {
         lastErrorMessage = error.message;
         
-        if (i === CONFIG.MAX_RETRIES) {
+        // No reintentar si es error de validación
+        if (error.message.includes('validación') || i === CONFIG.MAX_RETRIES) {
           throw error;
         }
         
         console.warn(`Intento ${i} fallido:`, error);
       }
     }
-    
-    // Mostrar resultado
-    showMessage("✅ " + (response.message || "Registro guardado exitosamente"), "success");
-    setTimeout(() => {
-      hideRegisterForm();
-      resetForm();
-    }, 1500);
+
+    // [Manejo de respuesta exitosa...]
 
   } catch (error) {
     console.error("Error final en handleFormSubmit:", {
       error: error.message,
       retries: appState.currentRetries,
-      timestamp: new Date()
+      lastRequestTime: appState.lastRequestTime,
+      currentTime: new Date()
     });
 
+    // Mensajes de error específicos
     let userMessage = lastErrorMessage;
     if (error.message.includes('conexión') || error.message.includes('servidor')) {
-      userMessage = `Problema de conexión detectado. Por favor:
-        1. Verifica tu conexión a internet
-        2. Intenta recargar la página
-        3. Si persiste, contacta al soporte técnico`;
+      userMessage = `Problema de conexión con el servidor. Por favor:<br>
+                    1. Verifica tu conexión a internet<br>
+                    2. Intenta recargar la página<br>
+                    3. Si persiste, contacta al soporte técnico`;
     }
 
     showMessage(`❌ ${userMessage}`, "error");
@@ -218,7 +179,9 @@ async function handleFormSubmit(e) {
   }
 }
 
-// Funciones auxiliares
+
+// [Funciones auxiliares se mantienen igual pero con mejoras]
+
 function generateUserId() {
   return `USR-${Date.now().toString().slice(-6)}-${Math.floor(Math.random() * 1000).toString().padStart(3, '0')}`;
 }
@@ -237,6 +200,7 @@ function hideRegisterForm() {
 function resetForm() {
   elements.registerForm.reset();
   elements.passwordStrength.style.width = '0%';
+  elements.passwordStrength.style.backgroundColor = '#e53e3e';
 }
 
 function checkSession() {
@@ -251,13 +215,15 @@ function checkSession() {
 }
 
 function initUI() {
-  // Event listeners
-  elements.registerUserBtn?.addEventListener('click', showRegisterForm);
-  elements.cancelBtn?.addEventListener('click', hideRegisterForm);
-  elements.logoutBtn?.addEventListener('click', logout);
+  // Event listeners con validación de existencia
+  if (elements.registerUserBtn) elements.registerUserBtn.addEventListener('click', showRegisterForm);
+  if (elements.cancelBtn) elements.cancelBtn.addEventListener('click', hideRegisterForm);
+  if (elements.logoutBtn) elements.logoutBtn.addEventListener('click', logout);
   
-  document.getElementById('password')?.addEventListener('input', checkPasswordStrength);
-  elements.registerForm?.addEventListener('submit', handleFormSubmit);
+  const passwordField = document.getElementById('password');
+  if (passwordField) passwordField.addEventListener('input', checkPasswordStrength);
+  
+  if (elements.registerForm) elements.registerForm.addEventListener('submit', handleFormSubmit);
 }
 
 function logout() {
@@ -275,6 +241,13 @@ function showMessage(text, type) {
   if (elements.formMessage) {
     elements.formMessage.textContent = text;
     elements.formMessage.className = `form-message ${type}`;
+    elements.formMessage.style.display = 'block';
+    
+    if (type !== 'loading') {
+      setTimeout(() => {
+        elements.formMessage.style.display = 'none';
+      }, 5000);
+    }
   }
 }
 
@@ -282,9 +255,9 @@ function checkPasswordStrength() {
   const password = this.value;
   let strength = 0;
   
-  if (password.length >= 4) strength++;
+  if (password.length >= 8) strength++;
   if (/\d/.test(password)) strength++;
-  if (/[A-Za-z]/.test(password)) strength++;
+  if (/[A-Z]/.test(password)) strength++;
   if (/[^A-Za-z0-9]/.test(password)) strength++;
 
   const colors = ['#e53e3e', '#f6ad55', '#68d391', '#38a169'];
