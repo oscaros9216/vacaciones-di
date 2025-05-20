@@ -1,169 +1,75 @@
 <!DOCTYPE html>
 <html lang="es">
 <head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
-    <title>Dashboard - Sistema de Colaboradores</title>
-    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.10.0/font/bootstrap-icons.css">
-    <link rel="stylesheet" href="css/style.css">
-    <style>
-        .signature-container {
-            position: relative;
-            border: 1px solid #ddd;
-            border-radius: 4px;
-            margin-bottom: 15px;
-            touch-action: none; /* Importante para dispositivos táctiles */
-        }
-        
-        .signature-pad {
-            width: 100%;
-            height: 200px;
-            background-color: white;
-        }
-        
-        .btn-clear {
-            position: absolute;
-            right: 10px;
-            bottom: 10px;
-            padding: 5px 10px;
-            background: #f44336;
-            color: white;
-            border: none;
-            border-radius: 4px;
-            cursor: pointer;
-        }
-        
-        @media (max-width: 768px) {
-            .signature-pad {
-                height: 150px;
-            }
-        }
-    </style>
+  <meta charset="UTF-8">
+  <title>Formulario Colaborador</title>
+  <style>
+    body { font-family: Arial, sans-serif; padding: 20px; }
+    label { display: block; margin-top: 10px; }
+    input, select { width: 100%; padding: 8px; margin-top: 5px; }
+    button { margin-top: 15px; padding: 10px 20px; }
+  </style>
 </head>
 <body>
-    <div class="dashboard-container">
-        <header>
-            <h1>Panel de Control</h1>
-            <div class="user-info">
-                <span id="userEmail"></span>
-                <button id="logoutBtn" class="btn-logout"><i class="bi bi-box-arrow-right"></i> Cerrar Sesión</button>
-            </div>
-        </header>
-        
-        <div class="dashboard-grid">
-            <!-- Panel de opciones -->
-            <div class="options-panel" id="optionsPanel">
-                <div class="option-card" id="registerUserBtn">
-                    <i class="bi bi-person-plus"></i>
-                    <span>Registrar Nuevo Usuario</span>
-                </div>
-                <div class="option-card" id="requestDayBtn">
-                    <i class="bi bi-calendar-plus"></i>
-                    <span>Solicitar Día</span>
-                </div>
-            </div>
-            
-            <!-- Formulario de registro -->
-            <div class="form-panel" id="registerFormPanel" style="display:none;">
-                <h2><i class="bi bi-person-plus"></i> Registrar Nuevo Usuario</h2>
-                <form id="registerForm">
-                    <input type="hidden" id="userId">
-                    
-                    <div class="form-row">
-                        <div class="form-group">
-                            <label for="userRole">Rol *</label>
-                            <select id="userRole" required>
-                                <option value="">Seleccionar...</option>
-                                <option value="admin">Administrador</option>
-                                <option value="user">Usuario</option>
-                            </select>
-                        </div>
-                        
-                        <div class="form-group">
-                            <label for="employeeNumber">Número de Colaborador *</label>
-                            <input type="number" id="employeeNumber" required>
-                        </div>
-                    </div>
-                    
-                    <div class="form-row">
-                        <div class="form-group">
-                            <label for="fullName">Nombre Completo *</label>
-                            <input type="text" id="fullName" required>
-                        </div>
-                        
-                        <div class="form-group">
-                            <label for="email">Email *</label>
-                            <input type="email" id="email" required>
-                        </div>
-                    </div>
-                    
-                    <div class="form-row">
-                        <div class="form-group">
-                            <label for="password">Contraseña *</label>
-                            <input type="password" id="password" required>
-                            <div class="password-strength">
-                                <div id="passwordStrength"></div>
-                            </div>
-                        </div>
-                        
-                        <div class="form-group">
-                            <label for="hireDate">Fecha de Ingreso</label>
-                            <input type="date" id="hireDate">
-                        </div>
-                    </div>
-                    
-                    <div class="form-row">
-                        <div class="form-group">
-                            <label for="vacationAuth">Autorización Vacaciones</label>
-                            <select id="vacationAuth">
-                                <option value="Si">Sí</option>
-                                <option value="No">No</option>
-                            </select>
-                        </div>
-                        
-                        <div class="form-group">
-                            <label for="managerName">Jefe Directo</label>
-                            <input type="text" id="managerName">
-                        </div>
-                    </div>
-                    
-                    <div class="form-group">
-                        <label for="managerEmail">Correo Jefe Directo</label>
-                        <input type="email" id="managerEmail">
-                    </div>
-                    
-                  
-                    
-                    <div class="form-group">
-                        <label for="eventTitle">Título del Evento (opcional)</label>
-                        <input type="text" id="eventTitle">
-                    </div>
-                    
-                    <div class="form-group">
-                        <label for="guestEmails">Correos Invitados (opcional)</label>
-                        <textarea id="guestEmails" rows="2"></textarea>
-                    </div>
-                    
-                    <div class="form-group">
-                        <label for="description">Descripción (opcional)</label>
-                        <textarea id="description" rows="3"></textarea>
-                    </div>
-                    
-                    <div class="form-group">
-                        <label for="message">Mensaje Personal (opcional)</label>
-                        <textarea id="message" rows="3"></textarea>
-                    </div>
-                    
-                    <div class="form-actions">
-                        <button type="button" id="cancelBtn" class="btn-cancel"><i class="bi bi-x-circle"></i> Cancelar</button>
-                        <button type="submit" class="btn-submit"><i class="bi bi-save"></i> Guardar</button>
-                    </div>
-                    <div id="formMessage" class="form-message"></div>
-                </form>
-            </div>
-        </div>
-    </div>
-    <script src="https://cdn.jsdelivr.net/npm/signature_pad@4.0.0/dist/signature_pad.umd.min.js"></script>
-    <script src="js/dashboard.js"></script>
+  <h2>Registro de Colaborador</h2>
+  <form id="userForm">
+    <label>ID:<input type="text" name="id" required></label>
+    <label>Rol:<input type="text" name="rol" required></label>
+    <label>Nombre:<input type="text" name="nombre" required></label>
+    <label>Email:<input type="email" name="email" required></label>
+    <label>Número de Colaborador:<input type="text" name="numero_colaborador" required></label>
+    <label>Fecha Ingreso:<input type="date" name="fecha_ingreso"></label>
+    <label>Contraseña:<input type="password" name="contraseña"></label>
+    <label>Vacaciones:
+      <select name="vacaciones">
+        <option value="Si">Sí</option>
+        <option value="No">No</option>
+      </select>
+    </label>
+    <label>Jefe Directo:<input type="text" name="jefe_directo"></label>
+    <label>Correo Jefe:<input type="email" name="correo_jefe"></label>
+    <button type="submit">Guardar</button>
+  </form>
+
+  <div id="resultado" style="margin-top: 20px;"></div>
+
+  <script>
+    const form = document.getElementById("userForm");
+    const resultado = document.getElementById("resultado");
+
+    form.addEventListener("submit", function(event) {
+      event.preventDefault();
+
+      const formData = new FormData(form);
+      const data = { action: "saveUserData" };
+
+      formData.forEach((value, key) => {
+        data[key] = value;
+      });
+
+      // 🔗 Reemplaza esta URL con la de tu Web App
+      const endpoint = "https://script.google.com/macros/s/AKfycbyI4TwH2l1rrjl5-wR27HRNjRu7jzroC8W5Buf8UasI7Qq2yg0ruGnx9SEzrU5wQTorpA/exec";
+
+      fetch(endpoint, {
+        method: "POST",
+        mode: "cors",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify(data)
+      })
+      .then(response => response.json())
+      .then(json => {
+        if (json.success) {
+          resultado.innerHTML = `<p style="color:green;">✅ ${json.message}</p>`;
+          form.reset();
+        } else {
+          resultado.innerHTML = `<p style="color:red;">❌ ${json.message}</p>`;
+        }
+      })
+      .catch(error => {
+        console.error("Error en fetch:", error);
+        resultado.innerHTML = `<p style="color:red;">❌ Error al conectar con el servidor</p>`;
+      });
+    });
+  </script>
 </body>
 </html>
