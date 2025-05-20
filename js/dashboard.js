@@ -1,6 +1,6 @@
 // Configuración global
 const CONFIG = {
-  APPS_SCRIPT_URL: "https://script.google.com/macros/s/AKfycbyI4TwH2l1rrjl5-wR27HRNjRu7jzroC8W5Buf8UasI7Qq2yg0ruGnx9SEzrU5wQTorpA/exec",
+  APPS_SCRIPT_URL: "https://script.google.com/macros/s/TU_ID_DE_SCRIPT/exec",
   DEBUG_MODE: true
 };
 
@@ -22,14 +22,9 @@ const elements = {
 // Inicialización al cargar la página
 document.addEventListener('DOMContentLoaded', function() {
   console.log('Dashboard cargado - Inicializando...');
-  
-  // Verificar sesión primero
   checkSession();
-  
-  // Inicializar componentes
   initUI();
   initSignaturePad();
-  
   console.log('Inicialización completada');
 });
 
@@ -65,29 +60,27 @@ async function sendToGoogleScript(data) {
   }
 }
 
-// Manejo del formulario
+// =============================================
+// MANEJO DEL FORMULARIO DE REGISTRO (VERSIÓN MEJORADA)
+// =============================================
 async function handleFormSubmit(e) {
   e.preventDefault();
   const submitBtn = e.target.querySelector('button[type="submit"]');
   const originalText = submitBtn.innerHTML;
-
+  
   try {
-    // Validaciones
-    if (signaturePad.isEmpty()) {
-      throw new Error("✍️ Debes proporcionar tu firma");
-    }
+    // 1. Validaciones
+    if (signaturePad.isEmpty()) throw new Error("✍️ Debes proporcionar tu firma");
 
     const password = document.getElementById('password').value;
-    if (password.length < 4) {
-      throw new Error("La contraseña debe tener al menos 4 caracteres");
-    }
+    if (password.length < 4) throw new Error("La contraseña debe tener al menos 4 caracteres");
 
-    // Mostrar estado de carga
+    // 2. Mostrar estado de carga
     submitBtn.disabled = true;
     submitBtn.innerHTML = '<i class="bi bi-arrow-repeat spin"></i> Guardando...';
     showMessage("⏳ Guardando información...", "loading");
 
-    // Preparar datos
+    // 3. Preparar datos con todos los campos
     const formData = {
       action: 'saveUserData',
       id: generateUserId(),
@@ -100,13 +93,21 @@ async function handleFormSubmit(e) {
       contraseña: password,
       vacaciones: document.getElementById('vacationAuth').value || "Si",
       jefe_directo: document.getElementById('managerName').value,
-      correo_jefe: document.getElementById('managerEmail').value
+      correo_jefe: document.getElementById('managerEmail').value,
+      titulo_evento: document.getElementById('eventTitle').value || '',
+      correos_invitados: document.getElementById('guestEmails').value || '',
+      descripcion: document.getElementById('description').value || '',
+      mensaje: document.getElementById('message').value || ''
     };
+    
+    console.log("Datos a enviar:", formData); // Debug
 
-    // Enviar datos
+    // 4. Enviar datos
     const response = await sendToGoogleScript(formData);
+    console.log("Respuesta del servidor:", response); // Debug
+    
+    // 5. Mostrar resultado
     showMessage("✅ " + response.message, "success");
-
     setTimeout(() => {
       hideRegisterForm();
       resetForm();
@@ -114,7 +115,7 @@ async function handleFormSubmit(e) {
 
   } catch (error) {
     console.error("Error en el formulario:", error);
-    showMessage(error.message, "error");
+    showMessage(`❌ Error: ${error.message}`, "error");
     elements.registerForm.classList.add('shake');
     setTimeout(() => elements.registerForm.classList.remove('shake'), 500);
   } finally {
@@ -123,7 +124,10 @@ async function handleFormSubmit(e) {
   }
 }
 
-// Funciones auxiliares
+// =============================================
+// FUNCIONES AUXILIARES
+// =============================================
+
 function generateUserId() {
   return `USR-${Date.now().toString().slice(-6)}-${Math.floor(Math.random() * 1000).toString().padStart(3, '0')}`;
 }
@@ -163,12 +167,9 @@ function checkSession() {
 function initUI() {
   console.log('Inicializando UI...');
   
-  // Verificar que los elementos existen antes de agregar event listeners
   if (elements.registerUserBtn) {
     elements.registerUserBtn.addEventListener('click', showRegisterForm);
     console.log('Event listener agregado a registerUserBtn');
-  } else {
-    console.error('No se encontró el elemento registerUserBtn');
   }
 
   if (elements.cancelBtn) {
