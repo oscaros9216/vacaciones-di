@@ -30,7 +30,7 @@ document.addEventListener('DOMContentLoaded', () => {
     data.firmaJefe = firmaJefe.toDataURL();
 
     try {
-      const response = await fetch("https://script.google.com/macros/s/AKfycbzPWDLF1oxRpIFr25HH52lC4pu91lumsKTmwf7KVziU-QOKkf8kI0izrwBxEpfGuGwjbw/exec", {
+      const response = await fetch("https://script.google.com/macros/s/AKfycbyqAIH0S-dtKzHrtoQUu36y3Mbd-6tJCJ-Il-dcoePHOdEpCqHdN9H6VKTN3_jYyRgxvg/exec", {
         method: "POST",
         body: JSON.stringify(data),
         headers: { "Content-Type": "application/json" }
