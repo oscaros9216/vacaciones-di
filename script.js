@@ -94,3 +94,80 @@ function showAlert(message, type) {
         setTimeout(() => alertDiv.remove(), 500);
     }, 3000);
 }
+// Variables globales para las firmas
+let firmaColaborador, firmaJefe;
+
+// Función para inicializar las firmas
+function inicializarFirmas() {
+    const canvasColaborador = document.getElementById('firma-colaborador');
+    const canvasJefe = document.getElementById('firma-jefe');
+    
+    // Ajustar tamaño de los canvas (IMPORTANTE para móviles)
+    canvasColaborador.width = canvasColaborador.offsetWidth;
+    canvasColaborador.height = 200;
+    canvasJefe.width = canvasJefe.offsetWidth;
+    canvasJefe.height = 200;
+    
+    // Inicializar SignaturePad
+    firmaColaborador = new SignaturePad(canvasColaborador, {
+        backgroundColor: 'rgba(255, 255, 255, 0)',
+        penColor: 'rgb(0, 0, 0)',
+        minWidth: 1,
+        maxWidth: 3,
+    });
+    
+    firmaJefe = new SignaturePad(canvasJefe, {
+        backgroundColor: 'rgba(255, 255, 255, 0)',
+        penColor: 'rgb(0, 0, 0)',
+        minWidth: 1,
+        maxWidth: 3,
+    });
+    
+    // Ajustar en redimensionamiento
+    window.addEventListener('resize', () => {
+        canvasColaborador.width = canvasColaborador.offsetWidth;
+        canvasJefe.width = canvasJefe.offsetWidth;
+    });
+}
+
+// Función para borrar firmas
+function borrarFirma(tipo) {
+    if (tipo === 'colaborador' && firmaColaborador) {
+        firmaColaborador.clear();
+    } else if (tipo === 'jefe' && firmaJefe) {
+        firmaJefe.clear();
+    }
+}
+
+// Al cargar la página
+document.addEventListener('DOMContentLoaded', () => {
+    inicializarFirmas();
+    
+    document.getElementById('registro-form').addEventListener('submit', async (e) => {
+        e.preventDefault();
+        
+        // Validar firmas antes de enviar
+        if (firmaColaborador.isEmpty()) {
+            alert('Por favor, ingrese la firma del colaborador');
+            return;
+        }
+        
+        if (firmaJefe.isEmpty()) {
+            alert('Por favor, ingrese la firma del jefe');
+            return;
+        }
+        
+        // Resto del código de envío...
+        try {
+            const formData = {
+                // ...otros campos
+                firmaColaborador: firmaColaborador.toDataURL('image/png'),
+                firmaJefe: firmaJefe.toDataURL('image/png')
+            };
+            
+            // Envío al servidor...
+        } catch (error) {
+            console.error('Error:', error);
+        }
+    });
+});
