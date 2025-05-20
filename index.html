@@ -46,17 +46,22 @@
                 <input type="email" id="correoJefe" name="correoJefe" required>
             </div>
 
-            <div class="form-group signature-container">
-                <label>Firma del Colaborador</label>
-                <canvas id="firma-colaborador"></canvas>
-                <button type="button" onclick="borrarFirma('colaborador')">Borrar Firma</button>
-            </div>
+          <!-- Dentro del formulario -->
+<div class="signature-container">
+    <label for="firma-colaborador">Firma del Colaborador *</label>
+    <canvas id="firma-colaborador"></canvas>
+    <button type="button" onclick="borrarFirma('colaborador')" class="btn-borrar">
+        Borrar Firma
+    </button>
+</div>
 
-            <div class="form-group signature-container">
-                <label>Firma del Jefe Directo</label>
-                <canvas id="firma-jefe"></canvas>
-                <button type="button" onclick="borrarFirma('jefe')">Borrar Firma</button>
-            </div>
+<div class="signature-container">
+    <label for="firma-jefe">Firma del Jefe Directo *</label>
+    <canvas id="firma-jefe"></canvas>
+    <button type="button" onclick="borrarFirma('jefe')" class="btn-borrar">
+        Borrar Firma
+    </button>
+</div>
 
             <button type="submit">Enviar Formulario</button>
         </form>
