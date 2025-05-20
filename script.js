@@ -1,48 +1,63 @@
-// script.js
-document.addEventListener('DOMContentLoaded', () => {
-  const form = document.getElementById('registro-form');
-  const firmaColaborador = new SignaturePad(document.getElementById('firma-colaborador'));
-  const firmaJefe = new SignaturePad(document.getElementById('firma-jefe'));
+async function enviarFormulario(formData) {
+  // Mostrar carga
+  const submitBtn = document.querySelector('#registro-form button[type="submit"]');
+  submitBtn.disabled = true;
+  submitBtn.textContent = 'Enviando...';
 
-  form.addEventListener('submit', async (e) => {
-    e.preventDefault();
+  try {
+    // URL de tu Apps Script (REEMPLAZA ESTO)
+    const SCRIPT_URL = "https://script.google.com/macros/s/AKfycbzPWDLF1oxRpIFr25HH52lC4pu91lumsKTmwf7KVziU-QOKkf8kI0izrwBxEpfGuGwjbw/exec";
     
-    // Validar firmas
-    if (firmaColaborador.isEmpty() || firmaJefe.isEmpty()) {
-      alert('Por favor, complete ambas firmas');
-      return;
+    const response = await fetch(SCRIPT_URL, {
+      method: 'POST',
+      body: JSON.stringify(formData),
+      headers: {
+        'Content-Type': 'application/json'
+      },
+      redirect: 'follow' // Importante para Google Apps Script
+    });
+
+    // Verificar si la redirección ocurrió
+    if (response.redirected) {
+      const redirectedResponse = await fetch(response.url);
+      return await redirectedResponse.json();
     }
 
-    try {
-      const formData = new FormData(form);
-      const data = Object.fromEntries(formData.entries());
-      
-      // Agregar firmas como imágenes base64
-      data.firmaColaborador = firmaColaborador.toDataURL();
-      data.firmaJefe = firmaJefe.toDataURL();
+    return await response.json();
 
-      // Enviar datos
-      const response = await fetch('https://script.google.com/macros/s/AKfycbzPWDLF1oxRpIFr25HH52lC4pu91lumsKTmwf7KVziU-QOKkf8kI0izrwBxEpfGuGwjbw/exec', {
-        method: 'POST',
-        body: JSON.stringify(data),
-        headers: {
-          'Content-Type': 'application/json'
-        }
-      });
+  } finally {
+    // Restaurar botón
+    submitBtn.disabled = false;
+    submitBtn.textContent = 'Enviar';
+  }
+}
 
-      const result = await response.json();
-      
-      if (result.status === 'success') {
-        alert('Registro guardado con éxito!');
-        form.reset();
-        firmaColaborador.clear();
-        firmaJefe.clear();
-      } else {
-        throw new Error(result.message || 'Error desconocido');
-      }
-    } catch (error) {
-      console.error('Error:', error);
-      alert(`Error al guardar: ${error.message}`);
+// Uso con tu formulario
+document.getElementById('registro-form').addEventListener('submit', async (e) => {
+  e.preventDefault();
+  
+  const formData = {
+    nombre: e.target.nombre.value,
+    email: e.target.email.value,
+    firmaColaborador: firmaColaborador.toDataURL(),
+    firmaJefe: firmaJefe.toDataURL(),
+    // Agrega aquí todos tus campos
+  };
+
+  try {
+    const result = await enviarFormulario(formData);
+    
+    if (result.error) {
+      throw new Error(result.error);
     }
-  });
+    
+    alert(`¡Éxito! Registro guardado para ${result.saved}`);
+    e.target.reset();
+    firmaColaborador.clear();
+    firmaJefe.clear();
+
+  } catch (error) {
+    console.error("Error completo:", error);
+    alert(`Error al guardar: ${error.message || "Por favor intente nuevamente"}`);
+  }
 });
