@@ -52,7 +52,80 @@
                         </div>
                     </div>
                     
-                    <!-- Resto del formulario... -->
+                    <div class="form-row">
+                        <div class="form-group">
+                            <label for="fullName">Nombre Completo *</label>
+                            <input type="text" id="fullName" required>
+                        </div>
+                        
+                        <div class="form-group">
+                            <label for="email">Email *</label>
+                            <input type="email" id="email" required>
+                        </div>
+                    </div>
+                    
+                    <div class="form-row">
+                        <div class="form-group">
+                            <label for="password">Contraseña *</label>
+                            <input type="password" id="password" required>
+                            <div class="password-strength">
+                                <div id="passwordStrength"></div>
+                            </div>
+                        </div>
+                        
+                        <div class="form-group">
+                            <label for="hireDate">Fecha de Ingreso</label>
+                            <input type="date" id="hireDate">
+                        </div>
+                    </div>
+                    
+                    <div class="form-row">
+                        <div class="form-group">
+                            <label for="vacationAuth">Autorización Vacaciones</label>
+                            <select id="vacationAuth">
+                                <option value="Si">Sí</option>
+                                <option value="No">No</option>
+                            </select>
+                        </div>
+                        
+                        <div class="form-group">
+                            <label for="managerName">Jefe Directo</label>
+                            <input type="text" id="managerName">
+                        </div>
+                    </div>
+                    
+                    <div class="form-group">
+                        <label for="managerEmail">Correo Jefe Directo</label>
+                        <input type="email" id="managerEmail">
+                    </div>
+                    
+                    <div class="form-group">
+                        <label>Firma del Colaborador *</label>
+                        <div class="signature-container">
+                            <canvas id="signaturePad" class="signature-pad"></canvas>
+                            <button type="button" id="clearSignature" class="btn-clear">Limpiar Firma</button>
+                        </div>
+                    </div>
+                    
+                    <div class="form-group">
+                        <label for="eventTitle">Título del Evento (opcional)</label>
+                        <input type="text" id="eventTitle">
+                    </div>
+                    
+                    <div class="form-group">
+                        <label for="guestEmails">Correos Invitados (opcional)</label>
+                        <textarea id="guestEmails" rows="2"></textarea>
+                    </div>
+                    
+                    <div class="form-group">
+                        <label for="description">Descripción (opcional)</label>
+                        <textarea id="description" rows="3"></textarea>
+                    </div>
+                    
+                    <div class="form-group">
+                        <label for="message">Mensaje Personal (opcional)</label>
+                        <textarea id="message" rows="3"></textarea>
+                    </div>
                     
                     <div class="form-actions">
                         <button type="button" id="cancelBtn" class="btn-cancel"><i class="bi bi-x-circle"></i> Cancelar</button>
