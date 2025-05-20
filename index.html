@@ -3,17 +3,29 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Formulario con Firmas Digitales</title>
-    <link href="https://fonts.googleapis.com/css2?family=Roboto:wght@400;500&display=swap" rel="stylesheet">
+    <title>Formulario de Registro - Colaboradores</title>
+    <link href="https://fonts.googleapis.com/css2?family=Roboto:wght@400;500;700&display=swap" rel="stylesheet">
     <style>
-        /* Estilos básicos para que funcione inmediatamente */
+        :root {
+            --primary: #4285f4;
+            --error: #ea4335;
+            --success: #34a853;
+            --border: #dadce0;
+            --text: #202124;
+        }
+        
+        * {
+            box-sizing: border-box;
+            margin: 0;
+            padding: 0;
+        }
+        
         body {
             font-family: 'Roboto', sans-serif;
             line-height: 1.6;
-            color: #333;
-            background-color: #f5f5f5;
+            color: var(--text);
+            background-color: #f8f9fa;
             padding: 20px;
-            margin: 0;
         }
         
         .container {
@@ -22,13 +34,14 @@
             background: white;
             padding: 30px;
             border-radius: 8px;
-            box-shadow: 0 0 20px rgba(0,0,0,0.1);
+            box-shadow: 0 2px 10px rgba(0, 0, 0, 0.1);
         }
         
         h1 {
-            color: #2c3e50;
+            color: var(--text);
             text-align: center;
             margin-bottom: 30px;
+            font-weight: 500;
         }
         
         .form-group {
@@ -39,30 +52,39 @@
             display: block;
             margin-bottom: 8px;
             font-weight: 500;
-            color: #2c3e50;
+            color: var(--text);
         }
         
         input, select, textarea {
             width: 100%;
             padding: 12px;
-            border: 1px solid #ddd;
+            border: 1px solid var(--border);
             border-radius: 4px;
             font-size: 16px;
             transition: border 0.3s;
         }
         
         input:focus, select:focus, textarea:focus {
-            border-color: #3498db;
+            border-color: var(--primary);
             outline: none;
-            box-shadow: 0 0 0 2px rgba(52,152,219,0.2);
+            box-shadow: 0 0 0 2px rgba(66, 133, 244, 0.2);
+        }
+        
+        textarea {
+            min-height: 100px;
+            resize: vertical;
         }
         
         .signature-container {
             margin: 25px 0;
-            border: 1px solid #ddd;
+            border: 1px solid var(--border);
             border-radius: 8px;
             padding: 15px;
             background: #f9f9f9;
+        }
+        
+        .signature-container label {
+            margin-bottom: 15px;
         }
         
         canvas {
@@ -74,39 +96,34 @@
             touch-action: none;
         }
         
-        .btn-borrar {
-            background: #e74c3c;
-            color: white;
-            border: none;
-            padding: 8px 15px;
-            margin-top: 10px;
+        .btn {
+            padding: 12px 20px;
             border-radius: 4px;
+            font-size: 16px;
             cursor: pointer;
-            font-size: 14px;
-        }
-        
-        .btn-borrar:hover {
-            background: #c0392b;
-        }
-        
-        button[type="submit"] {
-            background-color: #2ecc71;
-            color: white;
-            border: none;
-            padding: 15px;
-            font-size: 18px;
-            border-radius: 4px;
-            cursor: pointer;
-            width: 100%;
-            margin-top: 20px;
             transition: background-color 0.3s;
+            border: none;
         }
         
-        button[type="submit"]:hover {
-            background-color: #27ae60;
+        .btn-primary {
+            background-color: var(--primary);
+            color: white;
         }
         
-        button[type="submit"]:disabled {
+        .btn-primary:hover {
+            background-color: #3367d6;
+        }
+        
+        .btn-danger {
+            background-color: var(--error);
+            color: white;
+        }
+        
+        .btn-danger:hover {
+            background-color: #c23321;
+        }
+        
+        .btn[disabled] {
             background-color: #95a5a6;
             cursor: not-allowed;
         }
@@ -123,12 +140,12 @@
             max-width: 300px;
         }
         
-        .alert-error {
-            background-color: #e74c3c;
+        .alert-success {
+            background-color: var(--success);
         }
         
-        .alert-success {
-            background-color: #2ecc71;
+        .alert-error {
+            background-color: var(--error);
         }
         
         @keyframes fadeIn {
@@ -149,12 +166,27 @@
 </head>
 <body>
     <div class="container">
-        <h1>Formulario de Registro con Firmas</h1>
+        <h1>Formulario de Registro de Colaboradores</h1>
         <form id="registro-form">
-            <!-- Campos de información básica -->
+            <!-- Información Básica -->
+            <div class="form-group">
+                <label for="rol">Rol/Puesto *</label>
+                <input type="text" id="rol" name="rol" required>
+            </div>
+            
             <div class="form-group">
                 <label for="nombre">Nombre del Colaborador *</label>
                 <input type="text" id="nombre" name="nombre" required>
+            </div>
+            
+            <div class="form-group">
+                <label for="numero">Número de Colaborador *</label>
+                <input type="text" id="numero" name="numero" required>
+            </div>
+            
+            <div class="form-group">
+                <label for="fecha">Fecha de Ingreso *</label>
+                <input type="date" id="fecha" name="fecha" required>
             </div>
             
             <div class="form-group">
@@ -163,77 +195,83 @@
             </div>
             
             <div class="form-group">
-                <label for="rol">Rol/Puesto *</label>
-                <input type="text" id="rol" name="rol" required>
+                <label for="password">Contraseña Temporal</label>
+                <input type="password" id="password" name="password">
             </div>
             
             <div class="form-group">
-                <label for="numero">Número de Empleado *</label>
-                <input type="text" id="numero" name="numero" required>
+                <label for="vacaciones">¿Se autorizan vacaciones? *</label>
+                <select id="vacaciones" name="vacaciones" required>
+                    <option value="Sí">Sí</option>
+                    <option value="No">No</option>
+                </select>
             </div>
             
-            <div class="form-group">
-                <label for="fecha">Fecha *</label>
-                <input type="date" id="fecha" name="fecha" required>
-            </div>
-            
+            <!-- Información del Jefe -->
             <div class="form-group">
                 <label for="jefe">Jefe Directo *</label>
                 <input type="text" id="jefe" name="jefe" required>
             </div>
             
             <div class="form-group">
-                <label for="correoJefe">Correo del Jefe *</label>
+                <label for="correoJefe">Correo del Jefe Directo *</label>
                 <input type="email" id="correoJefe" name="correoJefe" required>
             </div>
             
-            <!-- Campos adicionales -->
-            <div class="form-group">
-                <label for="tituloEvento">Título del Evento/Proyecto *</label>
-                <input type="text" id="tituloEvento" name="tituloEvento" required>
-            </div>
-            
-            <div class="form-group">
-                <label for="invitados">Correos de Invitados (separados por comas)</label>
-                <textarea id="invitados" name="invitados" rows="3"></textarea>
-            </div>
-            
-            <div class="form-group">
-                <label for="descripcion">Descripción</label>
-                <textarea id="descripcion" name="descripcion" rows="4"></textarea>
-            </div>
-            
-            <!-- Áreas de firma -->
+            <!-- Áreas de Firma -->
             <div class="signature-container">
                 <label>Firma del Colaborador *</label>
                 <canvas id="firma-colaborador"></canvas>
-                <button type="button" class="btn-borrar" onclick="borrarFirma('colaborador')">Borrar Firma</button>
+                <button type="button" class="btn btn-danger" onclick="borrarFirma('colaborador')">Borrar Firma</button>
             </div>
             
             <div class="signature-container">
                 <label>Firma del Jefe Directo *</label>
                 <canvas id="firma-jefe"></canvas>
-                <button type="button" class="btn-borrar" onclick="borrarFirma('jefe')">Borrar Firma</button>
+                <button type="button" class="btn btn-danger" onclick="borrarFirma('jefe')">Borrar Firma</button>
             </div>
             
-            <button type="submit" id="submit-btn">Enviar Formulario</button>
+            <!-- Información Adicional -->
+            <div class="form-group">
+                <label for="tituloEvento">Título del Evento/Proyecto</label>
+                <input type="text" id="tituloEvento" name="tituloEvento">
+            </div>
+            
+            <div class="form-group">
+                <label for="invitados">Correos de Invitados (separados por comas)</label>
+                <textarea id="invitados" name="invitados"></textarea>
+            </div>
+            
+            <div class="form-group">
+                <label for="descripcion">Descripción</label>
+                <textarea id="descripcion" name="descripcion"></textarea>
+            </div>
+            
+            <div class="form-group">
+                <label for="mensaje">Mensaje Adicional</label>
+                <textarea id="mensaje" name="mensaje"></textarea>
+            </div>
+            
+            <!-- Botón de Envío -->
+            <button type="submit" id="btn-enviar" class="btn btn-primary">Enviar Formulario</button>
         </form>
     </div>
 
     <!-- Incluir SignaturePad desde CDN -->
     <script src="https://cdn.jsdelivr.net/npm/signature_pad@4.1.6/dist/signature_pad.umd.min.js"></script>
     
-    <!-- Nuestro script -->
+    <!-- Nuestro script (debe ir al final del body) -->
     <script>
         // Variables globales para las firmas
         let firmaColaborador, firmaJefe;
-        
-        // Función para inicializar las firmas
-        function inicializarFirmas() {
+
+        // Inicialización cuando el DOM esté listo
+        document.addEventListener('DOMContentLoaded', function() {
+            // 1. Configurar las áreas de firma
             const canvasColaborador = document.getElementById('firma-colaborador');
             const canvasJefe = document.getElementById('firma-jefe');
             
-            // Ajustar tamaño de los canvas
+            // Ajustar tamaño
             canvasColaborador.width = canvasColaborador.offsetWidth;
             canvasColaborador.height = 150;
             canvasJefe.width = canvasJefe.offsetWidth;
@@ -244,129 +282,129 @@
                 backgroundColor: 'rgba(255, 255, 255, 0)',
                 penColor: 'rgb(0, 0, 0)',
                 minWidth: 1,
-                maxWidth: 3,
+                maxWidth: 3
             });
             
             firmaJefe = new SignaturePad(canvasJefe, {
                 backgroundColor: 'rgba(255, 255, 255, 0)',
                 penColor: 'rgb(0, 0, 0)',
                 minWidth: 1,
-                maxWidth: 3,
+                maxWidth: 3
             });
             
-            // Ajustar en redimensionamiento
-            window.addEventListener('resize', () => {
-                canvasColaborador.width = canvasColaborador.offsetWidth;
-                canvasJefe.width = canvasJefe.offsetWidth;
-            });
-        }
-        
-        // Función para borrar firmas
-        function borrarFirma(tipo) {
-            if (tipo === 'colaborador' && firmaColaborador) {
-                firmaColaborador.clear();
-            } else if (tipo === 'jefe' && firmaJefe) {
-                firmaJefe.clear();
+            // 2. Configurar el evento submit del formulario
+            const formulario = document.getElementById('registro-form');
+            if (formulario) {
+                formulario.addEventListener('submit', manejarEnvioFormulario);
+            }
+        });
+
+        // Función para manejar el envío del formulario
+        async function manejarEnvioFormulario(evento) {
+            evento.preventDefault();
+            const boton = document.getElementById('btn-enviar');
+            
+            try {
+                // Deshabilitar botón durante el envío
+                boton.disabled = true;
+                boton.textContent = 'Enviando...';
+                
+                // 1. Validar firmas
+                if (firmaColaborador.isEmpty() || firmaJefe.isEmpty()) {
+                    throw new Error('Ambas firmas son requeridas');
+                }
+                
+                // 2. Obtener datos del formulario
+                const datosFormulario = {
+                    rol: document.getElementById('rol').value,
+                    nombre: document.getElementById('nombre').value,
+                    numero: document.getElementById('numero').value,
+                    fecha: document.getElementById('fecha').value,
+                    email: document.getElementById('email').value,
+                    password: document.getElementById('password').value,
+                    vacaciones: document.getElementById('vacaciones').value,
+                    jefe: document.getElementById('jefe').value,
+                    correoJefe: document.getElementById('correoJefe').value,
+                    tituloEvento: document.getElementById('tituloEvento').value,
+                    invitados: document.getElementById('invitados').value.split(',').map(item => item.trim()),
+                    descripcion: document.getElementById('descripcion').value,
+                    mensaje: document.getElementById('mensaje').value,
+                    firmaColaborador: firmaColaborador.toDataURL('image/png'),
+                    firmaJefe: firmaJefe.toDataURL('image/png')
+                };
+                
+                // 3. Validar campos requeridos
+                const camposRequeridos = ['rol', 'nombre', 'numero', 'fecha', 'email', 'jefe', 'correoJefe'];
+                const camposFaltantes = camposRequeridos.filter(campo => !datosFormulario[campo]);
+                
+                if (camposFaltantes.length > 0) {
+                    throw new Error(`Faltan campos obligatorios: ${camposFaltantes.join(', ')}`);
+                }
+                
+                // 4. Enviar datos al backend (Google Apps Script)
+                const SCRIPT_URL = "https://script.google.com/macros/s/AKfycbxDoYg7-1BQgLu_IrNr3kUi7KIbr0JJoK9rit2CKxjuokYrDhC7JLXQrTTaMrtcjhbAPg/exec"; // Reemplazar con tu URL
+                
+                const response = await fetch(SCRIPT_URL, {
+                    method: 'POST',
+                    body: JSON.stringify(datosFormulario),
+                    headers: {
+                        'Content-Type': 'text/plain' // Importante para Google Apps Script
+                    },
+                    mode: 'no-cors'
+                });
+                
+                // 5. Mostrar feedback al usuario
+                mostrarAlerta('Formulario enviado correctamente a Colaboradores', 'success');
+                
+                // 6. Limpiar formulario
+                resetearFormulario();
+                
+            } catch (error) {
+                console.error('Error en el envío:', error);
+                mostrarAlerta(`Error: ${error.message}`, 'error');
+            } finally {
+                // Restaurar botón
+                boton.disabled = false;
+                boton.textContent = 'Enviar Formulario';
             }
         }
-        
+
+        // Función para resetear el formulario
+        function resetearFormulario() {
+            document.getElementById('registro-form').reset();
+            firmaColaborador.clear();
+            firmaJefe.clear();
+        }
+
         // Función para mostrar alertas
         function mostrarAlerta(mensaje, tipo) {
+            // Eliminar alertas anteriores
+            const alertaAnterior = document.querySelector('.alert');
+            if (alertaAnterior) {
+                alertaAnterior.remove();
+            }
+            
+            // Crear elemento de alerta
             const alerta = document.createElement('div');
             alerta.className = `alert alert-${tipo}`;
             alerta.textContent = mensaje;
             document.body.appendChild(alerta);
             
+            // Ocultar después de 5 segundos
             setTimeout(() => {
                 alerta.style.opacity = '0';
                 setTimeout(() => alerta.remove(), 500);
-            }, 3000);
+            }, 5000);
         }
-        
-        // Cuando el DOM esté completamente cargado
-        document.addEventListener('DOMContentLoaded', () => {
-            // Inicializar firmas
-            inicializarFirmas();
-            
-            // Manejar envío del formulario
-            const formulario = document.getElementById('registro-form');
-            const btnEnviar = document.getElementById('submit-btn');
-            
-            if (formulario && btnEnviar) {
-                formulario.addEventListener('submit', async (e) => {
-                    e.preventDefault();
-                    
-                    // Deshabilitar botón para evitar envíos duplicados
-                    btnEnviar.disabled = true;
-                    btnEnviar.textContent = 'Enviando...';
-                    
-                    try {
-                        // Validar firmas
-                        if (firmaColaborador.isEmpty()) {
-                            throw new Error('Debe proporcionar la firma del colaborador');
-                        }
-                        
-                        if (firmaJefe.isEmpty()) {
-                            throw new Error('Debe proporcionar la firma del jefe');
-                        }
-                        
-                        // Obtener valores del formulario
-                        const obtenerValor = (id) => {
-                            const elemento = document.getElementById(id);
-                            return elemento ? elemento.value : '';
-                        };
-                        
-                        const datosFormulario = {
-                            nombre: obtenerValor('nombre'),
-                            email: obtenerValor('email'),
-                            rol: obtenerValor('rol'),
-                            numero: obtenerValor('numero'),
-                            fecha: obtenerValor('fecha'),
-                            jefe: obtenerValor('jefe'),
-                            correoJefe: obtenerValor('correoJefe'),
-                            tituloEvento: obtenerValor('tituloEvento'),
-                            invitados: obtenerValor('invitados'),
-                            descripcion: obtenerValor('descripcion'),
-                            firmaColaborador: firmaColaborador.toDataURL(),
-                            firmaJefe: firmaJefe.toDataURL()
-                        };
-                        
-                        // Validar campos requeridos
-                        if (!datosFormulario.nombre || !datosFormulario.email) {
-                            throw new Error('Nombre y email son campos obligatorios');
-                        }
-                        
-                        // Simular envío (reemplazar con tu URL real)
-                        const SCRIPT_URL = "TU_URL_DE_APPS_SCRIPT";
-                        
-                        const respuesta = await fetch(SCRIPT_URL, {
-                            method: 'POST',
-                            body: JSON.stringify(datosFormulario),
-                            headers: {
-                                'Content-Type': 'application/json'
-                            },
-                            mode: 'no-cors'
-                        });
-                        
-                        // Mostrar mensaje de éxito
-                        mostrarAlerta('Formulario enviado correctamente', 'success');
-                        
-                        // Limpiar formulario
-                        formulario.reset();
-                        firmaColaborador.clear();
-                        firmaJefe.clear();
-                        
-                    } catch (error) {
-                        console.error('Error:', error);
-                        mostrarAlerta(error.message || 'Error al enviar el formulario', 'error');
-                    } finally {
-                        // Restaurar botón
-                        btnEnviar.disabled = false;
-                        btnEnviar.textContent = 'Enviar Formulario';
-                    }
-                });
+
+        // Función global para borrar firmas (llamada desde HTML)
+        window.borrarFirma = function(tipo) {
+            if (tipo === 'colaborador' && firmaColaborador) {
+                firmaColaborador.clear();
+            } else if (tipo === 'jefe' && firmaJefe) {
+                firmaJefe.clear();
             }
-        });
+        };
     </script>
 </body>
 </html>
