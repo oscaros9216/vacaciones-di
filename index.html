@@ -1,430 +1,172 @@
 <!DOCTYPE html>
 <html lang="es">
 <head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
     <title>Formulario de Registro - Colaboradores</title>
-    <link href="https://fonts.googleapis.com/css2?family=Roboto:wght@400;500;700&display=swap" rel="stylesheet">
+    <link href="https://fonts.googleapis.com/css2?family=Roboto:wght@400;500;700&display=swap" rel="stylesheet" />
     <style>
-        :root {
-            --primary: #4285f4;
-            --error: #ea4335;
-            --success: #34a853;
-            --border: #dadce0;
-            --text: #202124;
-        }
-        
-        * {
-            box-sizing: border-box;
-            margin: 0;
-            padding: 0;
-        }
-        
-        body {
-            font-family: 'Roboto', sans-serif;
-            line-height: 1.6;
-            color: var(--text);
-            background-color: #f8f9fa;
-            padding: 20px;
-        }
-        
-        .container {
-            max-width: 800px;
-            margin: 0 auto;
-            background: white;
-            padding: 30px;
-            border-radius: 8px;
-            box-shadow: 0 2px 10px rgba(0, 0, 0, 0.1);
-        }
-        
-        h1 {
-            color: var(--text);
-            text-align: center;
-            margin-bottom: 30px;
-            font-weight: 500;
-        }
-        
-        .form-group {
-            margin-bottom: 20px;
-        }
-        
-        label {
-            display: block;
-            margin-bottom: 8px;
-            font-weight: 500;
-            color: var(--text);
-        }
-        
-        input, select, textarea {
-            width: 100%;
-            padding: 12px;
-            border: 1px solid var(--border);
-            border-radius: 4px;
-            font-size: 16px;
-            transition: border 0.3s;
-        }
-        
-        input:focus, select:focus, textarea:focus {
-            border-color: var(--primary);
-            outline: none;
-            box-shadow: 0 0 0 2px rgba(66, 133, 244, 0.2);
-        }
-        
-        textarea {
-            min-height: 100px;
-            resize: vertical;
-        }
-        
-        .signature-container {
-            margin: 25px 0;
-            border: 1px solid var(--border);
-            border-radius: 8px;
-            padding: 15px;
-            background: #f9f9f9;
-        }
-        
-        .signature-container label {
-            margin-bottom: 15px;
-        }
-        
-        canvas {
-            width: 100%;
-            height: 150px;
-            background: white;
-            border: 1px dashed #aaa;
-            border-radius: 4px;
-            touch-action: none;
-        }
-        
-        .btn {
-            padding: 12px 20px;
-            border-radius: 4px;
-            font-size: 16px;
-            cursor: pointer;
-            transition: background-color 0.3s;
-            border: none;
-        }
-        
-        .btn-primary {
-            background-color: var(--primary);
-            color: white;
-        }
-        
-        .btn-primary:hover {
-            background-color: #3367d6;
-        }
-        
-        .btn-danger {
-            background-color: var(--error);
-            color: white;
-        }
-        
-        .btn-danger:hover {
-            background-color: #c23321;
-        }
-        
-        .btn[disabled] {
-            background-color: #95a5a6;
-            cursor: not-allowed;
-        }
-        
-        .alert {
-            position: fixed;
-            top: 20px;
-            right: 20px;
-            padding: 15px 25px;
-            border-radius: 4px;
-            color: white;
-            z-index: 1000;
-            animation: fadeIn 0.3s;
-            max-width: 300px;
-        }
-        
-        .alert-success {
-            background-color: var(--success);
-        }
-        
-        .alert-error {
-            background-color: var(--error);
-        }
-        
-        @keyframes fadeIn {
-            from { opacity: 0; transform: translateY(-20px); }
-            to { opacity: 1; transform: translateY(0); }
-        }
-        
-        @media (max-width: 768px) {
-            .container {
-                padding: 15px;
-            }
-            
-            canvas {
-                height: 120px;
-            }
-        }
-        
-        .required:after {
-            content: " *";
-            color: var(--error);
-        }
+      /* Aquí va tu CSS completo igual que antes */
+      /* ... (omitido para no repetir) */
     </style>
 </head>
 <body>
-    <div class="container">
-        <h1>Formulario de Registro de Colaboradores</h1>
-        <form id="registro-form">
-            <!-- Información Básica -->
-            <div class="form-group">
-                <label for="rol" class="required">Rol/Puesto</label>
-                <input type="text" id="rol" name="rol" required>
-            </div>
-            
-            <div class="form-group">
-                <label for="nombre" class="required">Nombre del Colaborador</label>
-                <input type="text" id="nombre" name="nombre" required>
-            </div>
-            
-            <div class="form-group">
-                <label for="numero" class="required">Número de Colaborador</label>
-                <input type="text" id="numero" name="numero" required>
-            </div>
-            
-            <div class="form-group">
-                <label for="fecha" class="required">Fecha de Ingreso</label>
-                <input type="date" id="fecha" name="fecha" required>
-            </div>
-            
-            <div class="form-group">
-                <label for="email" class="required">Email Corporativo</label>
-                <input type="email" id="email" name="email" required>
-            </div>
-            
-            <div class="form-group">
-                <label for="password">Contraseña Temporal</label>
-                <input type="password" id="password" name="password">
-            </div>
-            
-            <div class="form-group">
-                <label for="vacaciones" class="required">¿Se autorizan vacaciones?</label>
-                <select id="vacaciones" name="vacaciones" required>
-                    <option value="">Seleccione...</option>
-                    <option value="Sí">Sí</option>
-                    <option value="No">No</option>
-                </select>
-            </div>
-            
-            <!-- Información del Jefe -->
-            <div class="form-group">
-                <label for="jefe" class="required">Jefe Directo</label>
-                <input type="text" id="jefe" name="jefe" required>
-            </div>
-            
-            <div class="form-group">
-                <label for="correoJefe" class="required">Correo del Jefe Directo</label>
-                <input type="email" id="correoJefe" name="correoJefe" required>
-            </div>
-            
-            <!-- Áreas de Firma -->
-            <div class="signature-container">
-                <label class="required">Firma del Colaborador</label>
-                <canvas id="firma-colaborador"></canvas>
-                <button type="button" id="clear-colaborador" class="btn btn-danger">Borrar Firma</button>
-            </div>
-            
-            <div class="signature-container">
-                <label class="required">Firma del Jefe Directo</label>
-                <canvas id="firma-jefe"></canvas>
-                <button type="button" id="clear-jefe" class="btn btn-danger">Borrar Firma</button>
-            </div>
-            
-            <!-- Información Adicional -->
-            <div class="form-group">
-                <label for="tituloEvento">Título del Evento/Proyecto</label>
-                <input type="text" id="tituloEvento" name="tituloEvento">
-            </div>
-            
-            <div class="form-group">
-                <label for="invitados">Correos de Invitados (separados por comas)</label>
-                <textarea id="invitados" name="invitados"></textarea>
-            </div>
-            
-            <div class="form-group">
-                <label for="descripcion">Descripción</label>
-                <textarea id="descripcion" name="descripcion"></textarea>
-            </div>
-            
-            <div class="form-group">
-                <label for="mensaje">Mensaje Adicional</label>
-                <textarea id="mensaje" name="mensaje"></textarea>
-            </div>
-            
-            <!-- Botón de Envío -->
-            <button type="submit" id="btn-enviar" class="btn btn-primary">Enviar Formulario</button>
-        </form>
-    </div>
+<div class="container">
+  <h1>Formulario de Registro de Colaboradores</h1>
+  <form id="registro-form">
+    <!-- Tus campos aquí (idénticos al código que diste) -->
+    <!-- ... -->
+    <!-- Botón de Envío -->
+    <button type="submit" id="btn-enviar" class="btn btn-primary">Enviar Formulario</button>
+  </form>
+</div>
 
-    <!-- Incluir SignaturePad desde CDN -->
-    <script src="https://cdn.jsdelivr.net/npm/signature_pad@4.1.6/dist/signature_pad.umd.min.js"></script>
-    
-    <!-- Script completo para el formulario -->
-    <script>
-        // Variables para las firmas
-        let signaturePadColaborador, signaturePadJefe;
-        
-        // Inicializar cuando el DOM esté listo
-        document.addEventListener('DOMContentLoaded', function() {
-            // Configurar firma del colaborador
-            const canvasColaborador = document.getElementById('firma-colaborador');
-            canvasColaborador.width = canvasColaborador.offsetWidth;
-            canvasColaborador.height = 150;
-            signaturePadColaborador = new SignaturePad(canvasColaborador, {
-                backgroundColor: 'rgba(255, 255, 255, 0)',
-                penColor: 'rgb(0, 0, 0)',
-                minWidth: 1,
-                maxWidth: 3
-            });
-            
-            // Configurar firma del jefe
-            const canvasJefe = document.getElementById('firma-jefe');
-            canvasJefe.width = canvasJefe.offsetWidth;
-            canvasJefe.height = 150;
-            signaturePadJefe = new SignaturePad(canvasJefe, {
-                backgroundColor: 'rgba(255, 255, 255, 0)',
-                penColor: 'rgb(0, 0, 0)',
-                minWidth: 1,
-                maxWidth: 3
-            });
-            
-            // Botones para borrar firmas
-            document.getElementById('clear-colaborador').addEventListener('click', function() {
-                signaturePadColaborador.clear();
-            });
-            
-            document.getElementById('clear-jefe').addEventListener('click', function() {
-                signaturePadJefe.clear();
-            });
-            
-            // Configurar el envío del formulario
-            document.getElementById('registro-form').addEventListener('submit', function(e) {
-                e.preventDefault();
-                enviarFormulario();
-            });
-        });
+<script src="https://cdn.jsdelivr.net/npm/signature_pad@4.1.6/dist/signature_pad.umd.min.js"></script>
 
-        function mostrarAlerta(mensaje, tipo) {
-            // Eliminar alertas anteriores
-            const alertaAnterior = document.querySelector('.alert');
-            if (alertaAnterior) {
-                alertaAnterior.remove();
-            }
-            
-            // Crear elemento de alerta
-            const alerta = document.createElement('div');
-            alerta.className = `alert alert-${tipo}`;
-            alerta.textContent = mensaje;
-            document.body.appendChild(alerta);
-            
-            // Ocultar después de 5 segundos
-            setTimeout(() => {
-                alerta.style.opacity = '0';
-                setTimeout(() => alerta.remove(), 500);
-            }, 5000);
+<script>
+  let signaturePadColaborador, signaturePadJefe;
+
+  document.addEventListener('DOMContentLoaded', function () {
+    const canvasColaborador = document.getElementById('firma-colaborador');
+    canvasColaborador.width = canvasColaborador.offsetWidth;
+    canvasColaborador.height = 150;
+    signaturePadColaborador = new SignaturePad(canvasColaborador, {
+      backgroundColor: 'rgba(255, 255, 255, 0)',
+      penColor: 'rgb(0, 0, 0)',
+      minWidth: 1,
+      maxWidth: 3,
+    });
+
+    const canvasJefe = document.getElementById('firma-jefe');
+    canvasJefe.width = canvasJefe.offsetWidth;
+    canvasJefe.height = 150;
+    signaturePadJefe = new SignaturePad(canvasJefe, {
+      backgroundColor: 'rgba(255, 255, 255, 0)',
+      penColor: 'rgb(0, 0, 0)',
+      minWidth: 1,
+      maxWidth: 3,
+    });
+
+    document.getElementById('clear-colaborador').addEventListener('click', () => signaturePadColaborador.clear());
+    document.getElementById('clear-jefe').addEventListener('click', () => signaturePadJefe.clear());
+
+    document.getElementById('registro-form').addEventListener('submit', function (e) {
+      e.preventDefault();
+      enviarFormulario();
+    });
+  });
+
+  function mostrarAlerta(mensaje, tipo) {
+    const alertaAnterior = document.querySelector('.alert');
+    if (alertaAnterior) alertaAnterior.remove();
+
+    const alerta = document.createElement('div');
+    alerta.className = `alert alert-${tipo}`;
+    alerta.textContent = mensaje;
+    document.body.appendChild(alerta);
+
+    setTimeout(() => {
+      alerta.style.opacity = '0';
+      setTimeout(() => alerta.remove(), 500);
+    }, 5000);
+  }
+
+  function enviarFormulario() {
+    const btnEnviar = document.getElementById('btn-enviar');
+    btnEnviar.disabled = true;
+    btnEnviar.textContent = 'Enviando...';
+
+    if (signaturePadColaborador.isEmpty() || signaturePadJefe.isEmpty()) {
+      mostrarAlerta('Error: Ambas firmas son requeridas', 'error');
+      btnEnviar.disabled = false;
+      btnEnviar.textContent = 'Enviar Formulario';
+      return;
+    }
+
+    const selectVacaciones = document.getElementById('vacaciones');
+    if (!selectVacaciones.value) {
+      mostrarAlerta('Error: Debe seleccionar una opción para vacaciones', 'error');
+      btnEnviar.disabled = false;
+      btnEnviar.textContent = 'Enviar Formulario';
+      return;
+    }
+
+    const datos = {
+      rol: document.getElementById('rol').value.trim(),
+      nombre: document.getElementById('nombre').value.trim(),
+      numero: document.getElementById('numero').value.trim(),
+      fecha: document.getElementById('fecha').value,
+      email: document.getElementById('email').value.trim(),
+      password: document.getElementById('password').value,
+      vacaciones: selectVacaciones.value,
+      jefe: document.getElementById('jefe').value.trim(),
+      correoJefe: document.getElementById('correoJefe').value.trim(),
+      tituloEvento: document.getElementById('tituloEvento').value.trim(),
+      invitados: document.getElementById('invitados').value
+        .split(',')
+        .map((item) => item.trim())
+        .filter((item) => item),
+      descripcion: document.getElementById('descripcion').value.trim(),
+      mensaje: document.getElementById('mensaje').value.trim(),
+      firmaColaborador: signaturePadColaborador.toDataURL('image/png'),
+      firmaJefe: signaturePadJefe.toDataURL('image/png'),
+      timestamp: new Date().toISOString(),
+    };
+
+    const camposRequeridos = [
+      'rol',
+      'nombre',
+      'numero',
+      'fecha',
+      'email',
+      'vacaciones',
+      'jefe',
+      'correoJefe',
+    ];
+    const camposFaltantes = camposRequeridos.filter((campo) => !datos[campo]);
+
+    if (camposFaltantes.length > 0) {
+      mostrarAlerta(
+        `Error: Faltan campos obligatorios: ${camposFaltantes.join(', ')}`,
+        'error'
+      );
+      btnEnviar.disabled = false;
+      btnEnviar.textContent = 'Enviar Formulario';
+      return;
+    }
+
+    const SCRIPT_URL = 'https://script.google.com/macros/s/AKfycbxDoYg7-1BQgLu_IrNr3kUi7KIbr0JJoK9rit2CKxjuokYrDhC7JLXQrTTaMrtcjhbAPg/exec'; // Cambia por tu URL
+
+    fetch(SCRIPT_URL, {
+      method: 'POST',
+      body: JSON.stringify(datos),
+      headers: {
+        'Content-Type': 'application/json',
+      },
+    })
+      .then((response) => {
+        if (!response.ok) throw new Error('Error en la respuesta del servidor');
+        return response.json();
+      })
+      .then((resultado) => {
+        if (resultado.status === 'success') {
+          mostrarAlerta('Formulario enviado correctamente', 'success');
+          document.getElementById('registro-form').reset();
+          signaturePadColaborador.clear();
+          signaturePadJefe.clear();
+        } else {
+          throw new Error(resultado.message || 'Error desconocido');
         }
-
-        function enviarFormulario() {
-            const btnEnviar = document.getElementById('btn-enviar');
-            btnEnviar.disabled = true;
-            btnEnviar.textContent = 'Enviando...';
-            
-            // Validar firmas
-            if (signaturePadColaborador.isEmpty() || signaturePadJefe.isEmpty()) {
-                mostrarAlerta('Error: Ambas firmas son requeridas', 'error');
-                btnEnviar.disabled = false;
-                btnEnviar.textContent = 'Enviar Formulario';
-                return;
-            }
-            
-            // Validar select de vacaciones
-            const selectVacaciones = document.getElementById('vacaciones');
-            if (!selectVacaciones.value) {
-                mostrarAlerta('Error: Debe seleccionar una opción para vacaciones', 'error');
-                btnEnviar.disabled = false;
-                btnEnviar.textContent = 'Enviar Formulario';
-                return;
-            }
-            
-            // Obtener datos del formulario
-            const datos = {
-                rol: document.getElementById('rol').value.trim(),
-                nombre: document.getElementById('nombre').value.trim(),
-                numero: document.getElementById('numero').value.trim(),
-                fecha: document.getElementById('fecha').value,
-                email: document.getElementById('email').value.trim(),
-                password: document.getElementById('password').value,
-                vacaciones: selectVacaciones.value,
-                jefe: document.getElementById('jefe').value.trim(),
-                correoJefe: document.getElementById('correoJefe').value.trim(),
-                tituloEvento: document.getElementById('tituloEvento').value.trim(),
-                invitados: document.getElementById('invitados').value.split(',').map(item => item.trim()).filter(item => item),
-                descripcion: document.getElementById('descripcion').value.trim(),
-                mensaje: document.getElementById('mensaje').value.trim(),
-                firmaColaborador: signaturePadColaborador.toDataURL('image/png'),
-                firmaJefe: signaturePadJefe.toDataURL('image/png'),
-                timestamp: new Date().toISOString()
-            };
-            
-            // Validar campos requeridos
-            const camposRequeridos = ['rol', 'nombre', 'numero', 'fecha', 'email', 'vacaciones', 'jefe', 'correoJefe'];
-            const camposFaltantes = camposRequeridos.filter(campo => !datos[campo]);
-            
-            if (camposFaltantes.length > 0) {
-                mostrarAlerta(`Error: Faltan campos obligatorios: ${camposFaltantes.join(', ')}`, 'error');
-                btnEnviar.disabled = false;
-                btnEnviar.textContent = 'Enviar Formulario';
-                return;
-            }
-            
-            // Enviar datos al Google Apps Script
-            const SCRIPT_URL = "https://script.google.com/macros/s/AKfycbxDoYg7-1BQgLu_IrNr3kUi7KIbr0JJoK9rit2CKxjuokYrDhC7JLXQrTTaMrtcjhbAPg/exec";
-            
-            fetch(SCRIPT_URL, {
-                method: 'POST',
-                body: JSON.stringify(datos),
-                headers: {
-                    'Content-Type': 'application/json'
-                }
-         
-            })
-            .then(response => {
-                if (!response.ok) {
-                    throw new Error('Error en la respuesta del servidor');
-                }
-                return response.text();
-            })
-            .then(data => {
-                try {
-                    const resultado = JSON.parse(data);
-                    if (resultado.status === 'success') {
-                        mostrarAlerta('Formulario enviado correctamente', 'success');
-                        document.getElementById('registro-form').reset();
-                        signaturePadColaborador.clear();
-                        signaturePadJefe.clear();
-                    } else {
-                        throw new Error(resultado.message || 'Error desconocido');
-                    }
-                } catch (e) {
-                    throw new Error('Respuesta no válida del servidor');
-                }
-            })
-            .catch(error => {
-                console.error('Error:', error);
-                mostrarAlerta(`Error al enviar el formulario: ${error.message}`, 'error');
-            })
-            .finally(() => {
-                btnEnviar.disabled = false;
-                btnEnviar.textContent = 'Enviar Formulario';
-            });
-        }
-    </script>
+      })
+      .catch((error) => {
+        console.error('Error:', error);
+        mostrarAlerta(`Error al enviar el formulario: ${error.message}`, 'error');
+      })
+      .finally(() => {
+        btnEnviar.disabled = false;
+        btnEnviar.textContent = 'Enviar Formulario';
+      });
+  }
+</script>
 </body>
 </html>
